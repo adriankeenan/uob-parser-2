@@ -4,16 +4,16 @@ A JSON API for the University of Bedfordshire timetable system.
 
 This is a replacement for the v1 parser.
 
-## Built using
+Built using:
 
+- Klein
 - DOMDocument
 - DOMXPath
-- Klein
 
-## Requirements
+Requirements:
 
-- Composer
 - PHP 5.4
+- Composer
 
 ## Background
 
@@ -23,8 +23,34 @@ Departments, courses and other options available on the timetable web page are p
 
 ## Usage
 
-- Use ```/courses``` for a list of courses and their associated departments
-- Each ```Course``` object will contain a ```timetable_url``` attribute pointing to ```/sessions/?a=1&b=2....``` which can be used to grab the session list. Of course you can build this yourself too.
+When used as a library the parser will return an array:
+
+- Courses
+	```php
+	$parser = new UoBParser\Parser();
+	$courseData = $parser->getCourses());
+	```
+	
+- Sessions
+	```php
+	$parser = new UoBParser\Parser();
+	$sessions = $parser->getSessions($dept, $course, $level);
+	```
+
+
+
+When used as a web service the parser will return a JSON response:
+
+- Courses
+	```
+	/courses
+	```
+
+- Sessions
+	```
+	/sessions?dept=_&course=_&level=_
+	```
+
 
 ## Limitations
 
@@ -32,7 +58,7 @@ While the output format is fairly reliable, there are some sessions which have n
 
 Also this newer version of the parser does not support parsing term dates. That was a nice feature but the source page appeared to be edited by hand and humans aren't very consistent so it was a huge pain to maintain support for it.
 
-## Output
+## Example output
 
 ### Session
 
