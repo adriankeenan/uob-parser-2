@@ -28,7 +28,7 @@ When used as a library the parser will return an array:
 - Courses
 	```php
 	$parser = new UoBParser\Parser();
-	$courseData = $parser->getCourses());
+	$courseData = $parser->getCourses();
 	```
 	
 - Sessions
