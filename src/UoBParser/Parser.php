@@ -51,7 +51,7 @@ class Parser
         try {
 
             //post data to get html string
-            $url = 'http://timetable.beds.ac.uk/sws'.Utils::yearString().'/showtimetable.asp';
+            $url = 'https://timetable.beds.ac.uk/sws'.Utils::yearString().'/showtimetable.asp';
 
             //get the current term (estimated)
             //then get relevant lbxWeeks
