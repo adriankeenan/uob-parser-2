@@ -14,28 +14,22 @@ $klein = new \Klein\Klein();
 
 $klein->respond('GET', '/courses', function($request, $response){
 
-    $response->header('Content-type', 'application/json');
-
     $parser = new UoBParser\Parser();
-    return json_encode($parser->getCourses());
+    $response->json($parser->getCourses());
 });
 
 $klein->respond('GET', '/sessions', function($request, $response){
-
-    $response->header('Content-type', 'application/json');
 
     $dept   = $request->param('dept');
     $course = $request->param('course');
     $level  = $request->param('level');
 
     $parser = new UoBParser\Parser();
-    return json_encode($parser->getSessions($dept, $course, $level));
+    $response->json($parser->getSessions($dept, $course, $level));
 });
 
 $klein->onHttpError(function($code, $router){
-
-    $router->response()->header('Content-type', 'application/json');
-        
+      
     $data = [
         'error' => true,
         'error_str' => 'You appear to be lost, this route doesn\'t exist',
@@ -45,7 +39,7 @@ $klein->onHttpError(function($code, $router){
         ]
     ];
 
-    $router->response()->body(json_encode($data));
+    $router->response()->json($data);
 });
 
 $klein->dispatch();
