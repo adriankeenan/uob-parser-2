@@ -89,7 +89,6 @@ class Course
             'id'            => $this->id,
             'name'          => $this->name,
             'level'         => $this->level,
-            'dept_id'       => $this->deptId,
             'department'    => $this->department,
             'session_url'   => $this->sessionUrl(),
 

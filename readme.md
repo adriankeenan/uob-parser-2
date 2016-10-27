@@ -107,7 +107,6 @@ Also this newer version of the parser does not support parsing term dates. That 
 		    "id": "BSCCS-S/02AA/1/CIS213/BSc (Hons)/FT",
 		    "name": "Computer Science - BSc (Hons) - Ltn - Year 1 Feb FT",
 		    "level": "Undergraduate Year 1",
-		    "dept_id": "12600",
 		    "department": 
 		    {
 		        "id": "12600",
