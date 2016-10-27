@@ -170,7 +170,7 @@ class Parser
         $this->startTimer();
 
         try {
-            $url = 'http://timetable.beds.ac.uk/sws'.Utils::yearString().'/js/data_autogen.js';
+            $url = 'https://timetable.beds.ac.uk/sws'.Utils::yearString().'/js/data_autogen.js';
             $src = Utils::request($url, 'get');
 
             if ($src === false)
