@@ -68,7 +68,8 @@ When used as a web service the parser will return a JSON response:
 		    "department": 
 		    {
 		        "id": "12600",
-		        "name": "Department of Computer Science and Technology"
+		        "name": "Department of Computer Science and Technology",
+		        "course_count" : 125
 		    },
 		    "session_url": "http://whatever/sessions?dept=12600&course=BSCCS-S%2F02AA%2F1%2FCIS213%2FBSc+%28Hons%29%2FFT&level=Undergraduate+Year+1",
 		    "name_start": "Computer Science",
@@ -79,7 +80,8 @@ When used as a web service the parser will return a JSON response:
 	[
 		{
 		    "id": "12600",
-		    "name": "Department of Computer Science and Technology"
+		    "name": "Department of Computer Science and Technology",
+		    "course_count" : 125
 		}
 	]
 }

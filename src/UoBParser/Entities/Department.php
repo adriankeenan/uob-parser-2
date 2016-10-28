@@ -8,6 +8,7 @@ class Department
     {
         $this->id = $id;
         $this->name = $name;
+        $this->courseCount = null;
     }
 
     /**
@@ -17,8 +18,9 @@ class Department
     public function toArray()
     {
         return [
-        	'id' 	=> $this->id,
-        	'name' 	=> $this->name
+            'id'            => $this->id,
+            'name'          => $this->name,
+            'course_count'  => $this->courseCount
         ];
     }
 }

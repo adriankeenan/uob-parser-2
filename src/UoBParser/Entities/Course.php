@@ -89,7 +89,7 @@ class Course
             'id'            => $this->id,
             'name'          => $this->name,
             'level'         => $this->level,
-            'department'    => $this->department,
+            'department'    => $this->department ? $this->department->toArray() : null,
             'session_url'   => $this->sessionUrl(),
 
         ];

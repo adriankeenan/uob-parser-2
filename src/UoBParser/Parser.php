@@ -222,8 +222,20 @@ class Parser
             }
         }
 
+        //set the course count for each department
+        foreach ($depts as $department)
+        {
+            $department->courseCount = 0;
+
+            foreach ($courses as $course)
+            {
+                if ($course->deptId == $department->id)
+                    $department->courseCount++;
+            }
+        }
+
         //set the course department using department array
-        foreach ($courses as &$course)
+        foreach ($courses as $course)
         {
             foreach ($depts as $department)
             {
