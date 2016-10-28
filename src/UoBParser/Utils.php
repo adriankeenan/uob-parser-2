@@ -56,39 +56,17 @@ class Utils
     }
 
     /**
-     * Make an HTTP request
-     * @param string $url
-     * @param string $method
-     * @param array $params
-     * @return string
+     * Returns a Guzzle client instance with default settings applied
+     * @return GuzzleHttp\Client
      */
-    public static function request($url, $method = null, $params = null)
+    public static function makeGuzzle()
     {
-        $result = false;
-
-        if (strtolower($method) == 'get' || $method === null){
-
-            if ($params != null)
-                $url = $url.'?'.http_build_query($params);
-
-            $result = file_get_contents($url);
-
-        } else if (strtolower($method) == 'post'){
-
-            $options = [
-                'http' => [
-                    'method'  => 'POST',
-                    'content' => http_build_query($params)
+        return new \GuzzleHttp\Client([
+            'defaults' => [
+                'headers' => [
+                    'User-Agent' => 'uob-parser-2'
                 ]
-            ];
-            $context    = stream_context_create($options);
-            $result     = file_get_contents($url, false, $context);
-        }
-
-        //connection error or not 200 response
-        if ($result === false || !strpos($http_response_header[0], '200'))
-            return false;
-
-        return $result;
+            ]
+        ]);
     }
 }

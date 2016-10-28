@@ -64,7 +64,7 @@ class Parser
 
             $currentTermWeeks = $termWeekRanges[Utils::estimatedTerm()];
 
-            $params = array(
+            $params = [
                 'ddlDepartments'        =>  $dept,
                 'ddlPosGroup'           =>  $level,
                 'lbxPos'                =>  $course,
@@ -76,11 +76,16 @@ class Parser
                 'ObjectClass'           =>  'programme of study',
                 'ObjectClassIdentifier' =>  'lbxPos',
                 'idtype'                =>  'id'
-            );
+            ];
 
-            $src = Utils::request($url, 'post', $params);
-            if ($src === false)
+            try
+            {
+                $client = Utils::makeGuzzle();
+                $response = $client->request('POST', $url, ['form_params' => $params]);
+                $src = $response->getBody();
+            } catch (Exception $e) {
                 throw new ParserException('Server response error');
+            }
 
             $sessions = $this->parseSessionDocument($src);
 
@@ -170,11 +175,17 @@ class Parser
         $this->startTimer();
 
         try {
-            $url = 'https://timetable.beds.ac.uk/sws'.Utils::yearString().'/js/data_autogen.js';
-            $src = Utils::request($url, 'get');
 
-            if ($src === false)
+            $url = 'https://timetable.beds.ac.uk/sws'.Utils::yearString().'/js/data_autogen.js';
+
+            try
+            {
+                $client = Utils::makeGuzzle();
+                $response = $client->request('GET', $url);
+                $src = $response->getBody();
+            } catch (Exception $e) {
                 throw new ParserException('Server response error');
+            }
 
             $data = $this->parseCourseDocument($src);
 

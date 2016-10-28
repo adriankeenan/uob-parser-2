@@ -4,13 +4,14 @@ A JSON API for the University of Bedfordshire timetable system.
 
 Built using:
 
-- Klein
+- [Klein](https://github.com/klein/klein.php)
+- [Guzzle](http://docs.guzzlephp.org/en/latest/)
 - DOMDocument
 - DOMXPath
 
 Requirements:
 
-- PHP 5.4
+- PHP 5.5
 - Composer
 
 ## Preamble
@@ -57,7 +58,7 @@ When used as a web service the parser will return a JSON response:
 
 ```
 {
-    "response_time": 6.5974431037903,
+    "response_time": 0.69508790969849,
     "error": false,
     "courses": 
 	[
