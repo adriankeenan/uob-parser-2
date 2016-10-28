@@ -61,13 +61,11 @@ class Session
     public function roomsShort()
     {
         return array_map(function($r){
-            $upToSpace = substr($r, 0, strpos($r, ' '));
-
-            $pattern = '(([A-Za-z]{1})([A-Za-z.]{1}\d|\d{2}|\d[A-Za-z.]{1}))';
-            if (preg_match("~^$pattern~", $upToSpace) > 0)
-                return trim($upToSpace, '-_');
-            else
-                return $r;
+            $pattern = '/^(([a-zA-Z]{1,}[\d]{1,}[a-zA-Z]{0,})|([a-zA-Z])[0-9]{1,}.[0-9]{1,})\s-/';
+            $matches = [];
+            if (preg_match($pattern, $r, $matches))
+                return $matches[1];
+            return $r;
         }, $this->rooms);
     }
 
