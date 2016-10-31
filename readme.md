@@ -4,7 +4,7 @@ A JSON API for the University of Bedfordshire timetable system.
 
 Built using:
 
-- [Klein](https://github.com/klein/klein.php)
+- [Slim](https://github.com/slimphp/Slim)
 - [Guzzle](http://docs.guzzlephp.org/en/latest/)
 - DOMDocument
 - DOMXPath
