@@ -25,10 +25,14 @@ class Course
         $args['course'] = $this->id;
         $args['level'] = $this->level;
 
-        $url =  'http://'.$_SERVER['SERVER_NAME'];
+        $isHttps = empty($_SERVER['HTTPS']) == false && $_SERVER['HTTPS'] != 'off';
+
+        $url = $isHttps ? 'https://' : 'http://';
+        $url .= $_SERVER['SERVER_NAME'];
         $url .= $_SERVER['SERVER_PORT'] != '80' ? ':' . $_SERVER['SERVER_PORT'] : '';
         $url .= dirname($_SERVER['PHP_SELF']);
         $url .= '/sessions?'.http_build_query($args);
+
         return $url;
     }
 
