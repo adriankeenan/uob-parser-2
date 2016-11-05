@@ -104,6 +104,7 @@ When used as a web service the parser will return a JSON response:
 		    "end": "11:00",
 		    "length": 2,
 		    "length_str": "2 hours",
+		    "type": "Lecture",
 		    "rooms": 
 			[
 			    "C016 - CST Teaching Lab"

@@ -111,6 +111,7 @@ class Session
             'end'           => $this->end,
             'length'        => $this->length,
             'length_str'    => $this->lengthStr,
+            'type'          => $this->type,
             'rooms'         => $this->rooms,
             'rooms_short'   => $this->roomsShort(),
             'staff'         => $this->staff,        
