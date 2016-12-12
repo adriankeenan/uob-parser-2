@@ -48,14 +48,20 @@ class Course
         $chunks = [];
         $bracketLevel = 0;
         $lastSectionStart = 0;
-
         foreach (str_split($name) as $index => $char) {
+            $atEnd = $index == strlen($name) -1;
+            
             if ($char == '(') {
                 $bracketLevel += 1;
             } else if ($char == ')') {
                 $bracketLevel -= 1;
-            } else if (($char == '-' || $index == strlen($name) -1) && $bracketLevel == 0){
-                $chunk = trim(substr($name, $lastSectionStart, $index), '- ');
+            } else if (($char == '-' || $atEnd) && $bracketLevel == 0){
+                if ($atEnd)
+                    $chunk = substr($name, $lastSectionStart);
+                else
+                    $chunk = substr($name, $lastSectionStart, $index - $lastSectionStart);
+                $chunk = trim($chunk, '- ');    
+                    
                 $chunks[] = $chunk;
                 $lastSectionStart = $index;
             }
