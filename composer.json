@@ -3,7 +3,8 @@
     "description": "A parser for the UoB timetable system",
     "require": {
         "guzzlehttp/guzzle": "~6.0",
-        "slim/slim": "^3.0"
+        "slim/slim": "^3.0",
+        "ext-xml": "*"
     },
     "autoload": {
         "psr-0": {
