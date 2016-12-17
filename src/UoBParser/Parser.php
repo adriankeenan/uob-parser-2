@@ -101,6 +101,11 @@ class Parser
 
     public function parseSessionDocument($src)
     {
+        //check for invalid session
+        //page returns 200 on error, so check contents
+        if (strpos($src, 'No Such Page') !== false)
+            throw new ParserException('Invalid course details');
+
         $doc = new DOMDocument();
         $doc->loadHTML($src);
 
