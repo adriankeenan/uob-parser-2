@@ -13,6 +13,10 @@ if (ltrim($base, '/'))
 use \Psr\Http\Message\ServerRequestInterface as Request;
 use \Psr\Http\Message\ResponseInterface as Response;
 
+// Get debug
+$debug = getenv('UOB_PARSER_DEBUG') === '1';
+
+// Init slim
 $container = new \Slim\Container();
 
 $container['notFoundHandler'] = function ($container) {
@@ -31,11 +35,17 @@ $container['notFoundHandler'] = function ($container) {
     };
 };
 
+$container['settings']['displayErrorDetails'] = $debug;
+
+$container['config'] = ['debug' => $debug];
+
 $app = new \Slim\App($container);
 
 $app->get('/courses', function (Request $request, Response $response) {
     
-    $parser = new UoBParser\Parser();
+    $debug = $this->config['debug'];
+
+    $parser = new UoBParser\Parser(true);
     $courses = $parser->getCourses();
 
     return $response->withJson($courses);
@@ -47,7 +57,9 @@ $app->get('/sessions', function (Request $request, Response $response) {
     $course = $request->getParam('course');
     $level  = $request->getParam('level');
 
-    $parser = new UoBParser\Parser();
+    $debug = $this->config['debug'];
+
+    $parser = new UoBParser\Parser($debug);
     $sessions = $parser->getSessions($dept, $course, $level);
 
     return $response->withJson($sessions);

@@ -11,10 +11,11 @@ class ParserException extends Exception { }
 
 class Parser
 {
-    public function __construct($extra = null)
+    public function __construct($debug = false)
     {
+        $this->debug = $debug;
+
         libxml_use_internal_errors(true);
-        $this->extra = $extra != null ? $extra : [];
     }
 
     private function startTimer()
@@ -31,17 +32,22 @@ class Parser
     {
         $timeTaken = microtime(true) - $this->startTime;
 
-        $isError = $data instanceof ParserException;
+        $isError = $data instanceof Exception;
 
-        $outputData = array_merge(['response_time' => $timeTaken, 'error' => $isError], $this->extra);
+        $outputData = [
+            'response_time' => $timeTaken, 
+            'error' => $isError
+        ];
 
         if (is_array($data)){
-            return array_merge($outputData, $data);
+            $outputData = array_merge($outputData, $data);
         } else if ($isError) {
-            return array_merge($outputData, [
-                'error_str' =>  $data->getMessage()
-            ]);
+            $outputData['error_str'] = $data->getMessage();
+            if ($this->debug)
+                $outputData['exception'] = ExceptionJsonable::fromException($data)->toArray();      
         }
+
+        return $outputData;
     }
 
     public function getSessions($dept, $course, $level)
@@ -84,7 +90,7 @@ class Parser
                 $response = $client->request('POST', $url, ['form_params' => $params]);
                 $src = $response->getBody();
             } catch (Exception $e) {
-                throw new ParserException('Server response error');
+                throw new ParserException('Server response error', 0, $e);
             }
 
             $sessions = $this->parseSessionDocument($src);
@@ -189,7 +195,7 @@ class Parser
                 $response = $client->request('GET', $url);
                 $src = $response->getBody();
             } catch (Exception $e) {
-                throw new ParserException('Server response error');
+                throw new ParserException('Server response error', 0, $e);
             }
 
             $data = $this->parseCourseDocument($src);
