@@ -52,6 +52,14 @@ When used as a web service the parser will return a JSON response:
 	/sessions?dept=_&course=_&level=_
 	```
 
+## Testing
+
+The webservice can be tested using the built in php webserver. Use the following command to start the server:
+
+```UOB_PARSER_DEBUG=1 php -S localhost:9000 -t public```
+
+Then navigate to [http://localhost:9000/courses](http://localhost:9000/courses)
+
 ## Output
 
 ### Courses

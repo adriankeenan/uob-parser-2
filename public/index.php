@@ -1,14 +1,6 @@
 <?php
 
-error_reporting(E_ALL);
-
-require_once __DIR__ . '/vendor/autoload.php';
-
-// Handle subdir
-$base = dirname($_SERVER['PHP_SELF']);
-
-if (ltrim($base, '/'))
-    $_SERVER['REQUEST_URI'] = substr($_SERVER['REQUEST_URI'], strlen($base));
+require_once dirname(__DIR__).'/vendor/autoload.php';
 
 use \Psr\Http\Message\ServerRequestInterface as Request;
 use \Psr\Http\Message\ResponseInterface as Response;
@@ -42,7 +34,7 @@ $container['config'] = ['debug' => $debug];
 $app = new \Slim\App($container);
 
 $app->get('/courses', function (Request $request, Response $response) {
-    
+
     $debug = $this->config['debug'];
 
     $parser = new UoBParser\Parser(true);
