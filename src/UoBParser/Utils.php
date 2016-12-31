@@ -41,7 +41,7 @@ class Utils
         $year = (new DateTime())->format('Y');
         foreach ($termRanges as $termRange){
             $start = (new DateTime())->setTime(0, 0, 0)->setDate($year, $termRange['start']['month'], $termRange['start']['date']);
-            $end =   (new DateTime())->setTime(0, 0, 0)->setDate($year, $termRange['end']['month'],   $termRange['end']['date']);
+            $end =   (new DateTime())->setTime(23, 59, 59)->setDate($year, $termRange['end']['month'],   $termRange['end']['date']);
 
             if ($start < new DateTime() && $end > new DateTime()){
                 $termNumber = $termRange['term'];
