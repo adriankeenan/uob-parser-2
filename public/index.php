@@ -37,7 +37,7 @@ $app->get('/courses', function (Request $request, Response $response) {
 
     $debug = $this->config['debug'];
 
-    $parser = new UoBParser\Parser(true);
+    $parser = new UoBParser\Parser($debug);
     $courses = $parser->getCourses();
 
     return $response->withJson($courses);
