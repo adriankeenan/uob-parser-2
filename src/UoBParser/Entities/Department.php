@@ -4,11 +4,15 @@ namespace UoBParser\Entities;
 
 class Department
 {
+    public $id;
+    public $name;
+    public $courseCount;
+
     public function __construct($id, $name)
     {
         $this->id = $id;
         $this->name = $name;
-        $this->courseCount = null;
+        $this->courseCount = -1;
     }
 
     /**

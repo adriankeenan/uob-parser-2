@@ -6,40 +6,48 @@ use \DateTime;
 
 class Session
 {
+    public $moduleCode;
+    public $moduleName;
+    public $type;
+    public $day;
+    public $start;
+    public $end;
+    public $rooms;
+    public $staff;
+
     function __construct($moduleCode, $moduleName, $type, $day, $start, $end, $rooms, $staff)
     {
-        $this->moduleCode = explode('/', $moduleCode)[0];
-        $this->moduleName = ucwords(strtolower($moduleName));
+        $this->moduleCode = $moduleCode;
+        $this->moduleName = $moduleName;
 
         $this->type = $type;
-
         $this->day = $day;
         $this->start = $start;
         $this->end = $end;
+        $this->rooms = $rooms;
+        $this->staff = $staff;
+    }
 
-        /**
-         * Parse length from start and end time to hours (as float)
-         */
-        $interval = DateTime::createFromFormat('H:i', $end)->diff(DateTime::createFromFormat('H:i', $start));
-        $seconds = abs((new DateTime())->setTimeStamp(0)->add($interval)->getTimeStamp());
-        $this->length = $seconds / 60 / 60;
-        /**
-         * Format length in to human readible string eg '1 hours', '2.5 hours'
-         */
-        $this->lengthStr = $this->length . ' hour' . ($this->length == 1 ? '' : 's');
+    /**
+     * Get the duration of the session in hours
+     * @return int|float
+     */
+    public function length()
+    {
+        $dateStart = DateTime::createFromFormat('H:i', $this->start);
+        $dateEnd = DateTime::createFromFormat('H:i', $this->end);
+        $seconds = $dateEnd->getTimestamp() - $dateStart->getTimestamp();
+        $hours = $seconds / 60 /60;
+        return $hours;
+    }
 
-        $this->rooms = explode(',', $rooms);
-
-        /**
-         * Parse input staff from 'lname, fname / lname, fname' to [ 'fname lname', ... ]
-         */
-        if (strpos($staff, ',') !== false){
-            $this->staff = array_map(function($s){
-                return trim(implode(' ', array_reverse(explode(',', $s))));
-            }, explode('/', $staff));
-        } else {
-            $this->staff = [];
-        }
+    /**
+     * Format length in to human readible string eg '1 hour', '2.5 hours'
+     * @return string
+     */
+    public function lengthStr()
+    {
+        return $this->length().' hour'.($this->length() == 1 ? '' : 's');
     }
 
     /**
@@ -109,8 +117,8 @@ class Session
             'day'           => $this->day,
             'start'         => $this->start,
             'end'           => $this->end,
-            'length'        => $this->length,
-            'length_str'    => $this->lengthStr,
+            'length'        => $this->length(),
+            'length_str'    => $this->lengthStr(),
             'type'          => $this->type,
             'rooms'         => $this->rooms,
             'rooms_short'   => $this->roomsShort(),

@@ -6,6 +6,12 @@ use \Exception;
 
 class Course
 {
+    public $id;
+    public $name;
+    public $level;
+    public $deptId;
+    public $department;
+
     function __construct($id, $name, $level, $deptId)
     {
         $this->id = $id;

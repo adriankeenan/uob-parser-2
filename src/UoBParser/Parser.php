@@ -11,6 +11,9 @@ class ParserException extends Exception { }
 
 class Parser
 {
+    private $debug;
+    private $startTime;
+
     public function __construct($debug = false)
     {
         $this->debug = $debug;
@@ -25,7 +28,7 @@ class Parser
 
     /**
      * Generate an array based on either valid output data or an exception
-     * @param array/exception $data
+     * @param array|Exception $data
      * @return array
      */
     public function makeResponse($data)
@@ -149,15 +152,25 @@ class Parser
                     continue;
 
                 //build session object
+
+                //parse input staff from 'lname, fname / lname, fname' to [ 'fname lname', ... ]
+                $staffStr = $cells->item(7)->nodeValue;
+                $staff = [];
+                if (strpos($staffStr, ',') !== false){
+                    $staff = array_map(function($s){
+                        return trim(implode(' ', array_reverse(explode(',', $s))));
+                    }, explode('/', $staffStr));
+                }
+
                 $session = new Entities\Session(
-                    $cells->item(0)->nodeValue,
-                    $cells->item(1)->nodeValue,
+                    explode('/', $cells->item(0)->nodeValue)[0],
+                    ucwords(strtolower($cells->item(1)->nodeValue)),
                     $cells->item(2)->nodeValue ,
                     $i,
                     $cells->item(3)->nodeValue,
                     $cells->item(4)->nodeValue,
-                    $cells->item(6)->nodeValue,
-                    $cells->item(7)->nodeValue
+                    explode(',', $cells->item(6)->nodeValue),
+                    $staff
                 );
 
                 //assume session is new unless duplicate found

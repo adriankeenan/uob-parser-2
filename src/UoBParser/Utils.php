@@ -38,10 +38,17 @@ class Utils
 
         //get current range
         $termNumber = 0;
-        $year = (new DateTime())->format('Y');
+        $year = intval((new DateTime())->format('Y'));
+        
         foreach ($termRanges as $termRange){
-            $start = (new DateTime())->setTime(0, 0, 0)->setDate($year, $termRange['start']['month'], $termRange['start']['date']);
-            $end =   (new DateTime())->setTime(23, 59, 59)->setDate($year, $termRange['end']['month'],   $termRange['end']['date']);
+            
+            $start = (new DateTime)
+                ->setTime(0, 0, 0)
+                ->setDate($year, $termRange['start']['month'], $termRange['start']['date']);
+            
+            $end = (new DateTime)
+                ->setTime(0, 0, 0)
+                ->setDate($year, $termRange['end']['month'], $termRange['end']['date']);
 
             if ($start < new DateTime() && $end > new DateTime()){
                 $termNumber = $termRange['term'];
@@ -57,7 +64,7 @@ class Utils
 
     /**
      * Returns a Guzzle client instance with default settings applied
-     * @return GuzzleHttp\Client
+     * @return \GuzzleHttp\Client
      */
     public static function makeGuzzle()
     {

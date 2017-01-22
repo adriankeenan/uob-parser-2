@@ -10,5 +10,8 @@
         "psr-0": {
             "UoBParser\\": "src/"
         }
+    },
+    "require-dev": {
+        "etsy/phan": "dev-master"
     }
 }
