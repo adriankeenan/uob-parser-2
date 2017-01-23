@@ -21,6 +21,10 @@ class Parser
         libxml_use_internal_errors(true);
     }
 
+    /**
+     * Start a timer used for measuring the response time
+     * @return null
+     */
     private function startTimer()
     {
         $this->startTime = microtime(true);
@@ -53,6 +57,14 @@ class Parser
         return $outputData;
     }
 
+    /**
+     * Download the timetable HTML for the selected course and return a
+     * response array containing the sessions
+     * @param string $dept Department for course
+     * @param string $course Department for course
+     * @param string $level Level for course
+     * @return array
+     */
     public function getSessions($dept, $course, $level)
     {
         $this->startTimer();
@@ -108,6 +120,11 @@ class Parser
 
     }
 
+    /**
+     * Get a list of session objects from the source HTML
+     * @param string $src HTLM source
+     * @return array[Entities\Session]
+     */
     public function parseSessionDocument($src)
     {
         //check for invalid session
@@ -194,6 +211,11 @@ class Parser
         return $sessions;
     }
 
+    /**
+     * Download the metadata javascript file and return a response array
+     * containing the courses and departments
+     * @return array
+     */
     public function getCourses()
     {
         $this->startTimer();
@@ -224,6 +246,12 @@ class Parser
 
     }
 
+    /**
+     * Get a list of course and session objects from the source javascript
+     * metadata
+     * @param string $src Source javascript file
+     * @return array
+     */
     public function parseCourseDocument($src)
     {
         $depts      = [];

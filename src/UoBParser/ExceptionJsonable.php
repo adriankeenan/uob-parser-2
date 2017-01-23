@@ -6,6 +6,11 @@ use \Exception;
 
 class ExceptionJsonable extends Exception {
 
+	/**
+	 * Creates a new ExceptionJsonable instance from a standard Exception
+	 * @param \Exception|null $ex
+	 * @return ExceptionJsonable|null
+	 */
 	public static function fromException($ex){ 
 
 		if ($ex == null) 
@@ -20,6 +25,10 @@ class ExceptionJsonable extends Exception {
 		return $ej;
 	}
 	
+	/**
+	 * Returns an array representing the exception, suitable for serialisation.
+	 * @return array
+	 */
 	public function toArray(){
 		
 		$data = [];
