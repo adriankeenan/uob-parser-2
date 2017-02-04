@@ -86,6 +86,12 @@ class Session
      */
     public function combine($other)
     {
+        if (strlen($this->moduleCode) == 0)
+            $this->moduleCode = $other->moduleCode;
+
+        if (strlen($this->moduleName) == 0)
+            $this->moduleName = $other->moduleName;
+
         $this->rooms = array_values(array_unique(array_merge($this->rooms, $other->rooms)));
         $this->staff = array_values(array_unique(array_merge($this->staff, $other->staff)));
         return $this;
@@ -99,7 +105,7 @@ class Session
      */
     public function hash()
     {
-        $attrKeys = ['module_code', 'type', 'start', 'end', 'day'];
+        $attrKeys = ['moduleCode', 'type', 'start', 'end', 'day'];
         $attrVals = array_intersect_key(get_object_vars($this), array_flip($attrKeys));
         $attrVals = array_values($attrVals);
         return md5(implode('', $attrVals));
@@ -135,6 +141,25 @@ class Session
      */
     public function equals($other)
     {
-        return $this->hash() == $other->hash();
+        //check for equality using standard attributes (times, type) and either
+        //the module (which may be blank) or room intersection, as two different
+        //sessions wont be happening in the same room.
+
+        //check for same day, type, start, end
+        if ($this->day != $other->day ||
+            $this->start != $other->start ||
+            $this->end != $other->end ||
+            $this->type != $other->type)
+            return false;
+
+        //check module code
+        if ($this->moduleCode == $other->moduleCode)
+            return true;
+
+        //check for room intersection
+        if (empty(array_intersect($this->rooms, $other->rooms)) == false)
+            return true;
+
+        return false;
     }
 }
