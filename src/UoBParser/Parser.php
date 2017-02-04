@@ -164,13 +164,26 @@ class Parser
                 //get collection of cells
                 $cells = $row->getElementsByTagName('td');
 
-                //no module code generally means a session does not exist
-                if (strlen($cells->item(1)->nodeValue) <= 3)
-                    continue;
+                //get values
 
-                //build session object
+                //check for &nbsp; value
+                $moduleCode = $cells->item(0)->nodeValue;
+                if ($moduleCode == chr(0xC2).chr(0xA0))
+                    $moduleCode = '';
 
-                //parse input staff from 'lname, fname / lname, fname' to [ 'fname lname', ... ]
+                $moduleName = ucwords(strtolower($cells->item(1)->nodeValue));
+                if ($moduleName == chr(0xC2).chr(0xA0))
+                    $moduleName = '';
+
+                $type = $cells->item(2)->nodeValue;
+
+                $day = $i;
+                $start = $cells->item(3)->nodeValue;
+                $end = $cells->item(4)->nodeValue;
+
+                $rooms = explode(',', $cells->item(6)->nodeValue);
+
+                //staff format: 'lname, fname / lname, fname' to [ 'fname lname', ... ]
                 $staffStr = $cells->item(7)->nodeValue;
                 $staff = [];
                 if (strpos($staffStr, ',') !== false){
@@ -179,14 +192,15 @@ class Parser
                     }, explode('/', $staffStr));
                 }
 
+                //build session object
                 $session = new Entities\Session(
-                    explode('/', $cells->item(0)->nodeValue)[0],
-                    ucwords(strtolower($cells->item(1)->nodeValue)),
-                    $cells->item(2)->nodeValue ,
-                    $i,
-                    $cells->item(3)->nodeValue,
-                    $cells->item(4)->nodeValue,
-                    explode(',', $cells->item(6)->nodeValue),
+                    $moduleCode,
+                    $moduleName,
+                    $type,
+                    $day,
+                    $start,
+                    $end,
+                    $rooms,
                     $staff
                 );
 
@@ -194,7 +208,7 @@ class Parser
                 $newSession = true;
 
                 //loop sessions
-                foreach($sessions as &$other)
+                foreach ($sessions as $other)
                 {
                     if ($other->equals($session)){
                         $other->combine($session);
