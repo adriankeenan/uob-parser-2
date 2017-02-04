@@ -167,7 +167,7 @@ class Parser
                 //get values
 
                 //check for &nbsp; value
-                $moduleCode = $cells->item(0)->nodeValue;
+                $moduleCode = explode('/', $cells->item(0)->nodeValue)[0];
                 if ($moduleCode == chr(0xC2).chr(0xA0))
                     $moduleCode = '';
 
