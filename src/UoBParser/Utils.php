@@ -30,10 +30,10 @@ class Utils
     {
         //date ranges
         $termRanges = [
-            ['term' => 1, 'start' => ['month' => 10, 'date' => 1], 'end' => ['month' => 12, 'date' => 15]],
+            ['term' => 1, 'start' => ['month' => 9, 'date' => 1], 'end' => ['month' => 12, 'date' => 15]],
             ['term' => 2, 'start' => ['month' => 12, 'date' => 15], 'end' => ['month' => 12, 'date' => 31]],
             ['term' => 2, 'start' => ['month' => 1, 'date' => 1], 'end' => ['month' => 3, 'date' => 20]],
-            ['term' => 3, 'start' => ['month' => 3, 'date' => 20], 'end' => ['month' => 10, 'date' => 1]]
+            ['term' => 3, 'start' => ['month' => 3, 'date' => 20], 'end' => ['month' => 9, 'date' => 1]]
         ];
 
         //get current range
@@ -45,7 +45,7 @@ class Utils
             $start = (new DateTime)
                 ->setTime(0, 0, 0)
                 ->setDate($year, $termRange['start']['month'], $termRange['start']['date']);
-            
+
             $end = (new DateTime)
                 ->setTime(23, 59, 59)
                 ->setDate($year, $termRange['end']['month'], $termRange['end']['date']);
