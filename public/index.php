@@ -13,7 +13,7 @@ $container = new \Slim\Container();
 
 $container['notFoundHandler'] = function ($container) {
     return function (Request $request, Response $response) use ($container) {
-        
+
         $data = [
             'error' => true,
             'error_str' => 'You appear to be lost, this route doesn\'t exist',
@@ -23,7 +23,7 @@ $container['notFoundHandler'] = function ($container) {
             ]
         ];
 
-        return $container['response']->withJson($data);
+        return $container['response']->withJson($data, 404, JSON_PRETTY_PRINT);
     };
 };
 
@@ -40,11 +40,11 @@ $app->get('/courses', function (Request $request, Response $response) {
     $parser = new UoBParser\Parser($debug);
     $courses = $parser->getCourses();
 
-    return $response->withJson($courses);
+    return $response->withJson($courses, 200, JSON_PRETTY_PRINT);
 });
 
 $app->get('/sessions', function (Request $request, Response $response) {
-    
+
     $dept   = $request->getParam('dept');
     $course = $request->getParam('course');
     $level  = $request->getParam('level');
@@ -54,7 +54,7 @@ $app->get('/sessions', function (Request $request, Response $response) {
     $parser = new UoBParser\Parser($debug);
     $sessions = $parser->getSessions($dept, $course, $level);
 
-    return $response->withJson($sessions);
+    return $response->withJson($sessions, 200, JSON_PRETTY_PRINT);
 });
 
 $app->run();
