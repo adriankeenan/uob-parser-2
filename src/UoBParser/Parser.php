@@ -42,7 +42,7 @@ class Parser
         $isError = $data instanceof Exception;
 
         $outputData = [
-            'response_time' => $timeTaken, 
+            'response_time' => $timeTaken,
             'error' => $isError
         ];
 
@@ -51,7 +51,7 @@ class Parser
         } else if ($isError) {
             $outputData['error_str'] = $data->getMessage();
             if ($this->debug)
-                $outputData['exception'] = ExceptionJsonable::fromException($data)->toArray();      
+                $outputData['exception'] = ExceptionJsonable::fromException($data)->toArray();
         }
 
         return $outputData;
@@ -77,10 +77,9 @@ class Parser
             //get the current term (estimated)
             //then get relevant lbxWeeks
             $termWeekRanges = [
-                0 => range(1, 52),
-                1 => range(7, 16),
-                2 => range(20, 30),
-                3 => range(34, 41)
+                1 => array_merge(range(6, 16), range(20, 23)),
+                2 => array_merge(range(24, 30), range(34, 41)),
+                3 => array_merge(range(42, 49), range(51, 54))
             ];
 
             $currentTermWeeks = $termWeekRanges[Utils::estimatedTerm()];
