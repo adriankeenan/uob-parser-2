@@ -17,7 +17,7 @@ class Utils
         $d = new DateTime;
         $m = intval($d->format('m'));
         $y = intval($d->format('y'));
-        return $m >= 6 ? $y.($y+1) : ($y-1).$y;
+        return $m >= 7 ? $y.($y+1) : ($y-1).$y;
     }
 
     /**
