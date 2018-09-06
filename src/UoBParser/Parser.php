@@ -150,9 +150,19 @@ class Parser
             //get rows
             $rows = $table->getElementsByTagName('tr');
 
-            //if one row, headers only, no content
-            if ($rows->length == 1)
+            //less than 2 rows for no content or header only
+            if ($rows->length < 2)
                 continue;
+
+            // The order of the coumns can change. To handle this, build a map of
+            // [$columnName => $index], this allows up to lookup later on by
+            // getting the index we need from this array.
+            $columnMap = [];
+            $headerRowCells = $rows->item(0)->getElementsByTagName('td');
+            foreach ($headerRowCells as $index => $cell){
+                $cellText = $cell->nodeValue;
+                $columnMap[$cellText] = $index;
+            }
 
             //start from second row
             for ($r = 1; $r < $rows->length; $r++)
@@ -165,42 +175,39 @@ class Parser
 
                 //get values
 
-                //check for &nbsp; value
-                $moduleCode = explode('/', $cells->item(0)->nodeValue)[0];
-                if ($moduleCode == chr(0xC2).chr(0xA0))
-                    $moduleCode = '';
+                $moduleName = '';
+                if (isset($columnMap['Title'])){
+                    $moduleName = ucwords(strtolower($cells->item($columnMap['Title'])->nodeValue));
+                    if ($moduleName == chr(0xC2).chr(0xA0))
+                        $moduleName = '';
+                }
 
-                $moduleName = ucwords(strtolower($cells->item(1)->nodeValue));
-                if ($moduleName == chr(0xC2).chr(0xA0))
-                    $moduleName = '';
-
-                $type = $cells->item(2)->nodeValue;
+                $type = '';
+                if (isset($columnMap['Type']))
+                    $type = $cells->item($columnMap['Type'])->nodeValue;
 
                 $day = $i;
-                $start = $cells->item(3)->nodeValue;
-                $end = $cells->item(4)->nodeValue;
 
-                $rooms = explode(',', $cells->item(6)->nodeValue);
+                $start = '';
+                if (isset($columnMap['Start']))
+                    $start = $cells->item($columnMap['Start'])->nodeValue;
 
-                //staff format: 'lname, fname / lname, fname' to [ 'fname lname', ... ]
-                $staffStr = $cells->item(7)->nodeValue;
-                $staff = [];
-                if (strpos($staffStr, ',') !== false){
-                    $staff = array_map(function($s){
-                        return trim(implode(' ', array_reverse(explode(',', $s))));
-                    }, explode('/', $staffStr));
-                }
+                $end = '';
+                if (isset($columnMap['End']))
+                    $end = $cells->item($columnMap['End'])->nodeValue;
+
+                $rooms = [];
+                if (isset($columnMap['Room']))
+                    $rooms = explode(',', $cells->item($columnMap['Room'])->nodeValue);
 
                 //build session object
                 $session = new Entities\Session(
-                    $moduleCode,
                     $moduleName,
                     $type,
                     $day,
                     $start,
                     $end,
-                    $rooms,
-                    $staff
+                    $rooms
                 );
 
                 //assume session is new unless duplicate found

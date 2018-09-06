@@ -6,26 +6,21 @@ use \DateTime;
 
 class Session
 {
-    public $moduleCode;
     public $moduleName;
     public $type;
     public $day;
     public $start;
     public $end;
     public $rooms;
-    public $staff;
 
-    function __construct($moduleCode, $moduleName, $type, $day, $start, $end, $rooms, $staff)
+    function __construct($moduleName, $type, $day, $start, $end, $rooms)
     {
-        $this->moduleCode = $moduleCode;
         $this->moduleName = $moduleName;
-
         $this->type = $type;
         $this->day = $day;
         $this->start = $start;
         $this->end = $end;
         $this->rooms = $rooms;
-        $this->staff = $staff;
     }
 
     /**
@@ -56,7 +51,7 @@ class Session
      */
     public function isValid()
     {
-        return strlen($this->moduleCode) > 0 && strlen($this->moduleName) > 0;
+        return empty($this->moduleName) == false;
     }
 
     /**
@@ -80,20 +75,16 @@ class Session
     /**
      * Add the attributes of another session to this session.
      * This is useful when the same session is listed multiple times but with
-     * different room members and staff.
+     * different rooms.
      * @param object $other
      * @return object
      */
     public function combine($other)
     {
-        if (strlen($this->moduleCode) == 0)
-            $this->moduleCode = $other->moduleCode;
-
         if (strlen($this->moduleName) == 0)
             $this->moduleName = $other->moduleName;
 
         $this->rooms = array_values(array_unique(array_merge($this->rooms, $other->rooms)));
-        $this->staff = array_values(array_unique(array_merge($this->staff, $other->staff)));
         return $this;
     }
 
@@ -105,7 +96,7 @@ class Session
      */
     public function hash()
     {
-        $attrKeys = ['moduleCode', 'type', 'start', 'end', 'day'];
+        $attrKeys = ['moduleName', 'type', 'start', 'end', 'day'];
         $attrVals = array_intersect_key(get_object_vars($this), array_flip($attrKeys));
         $attrVals = array_values($attrVals);
         return md5(implode('', $attrVals));
@@ -117,8 +108,12 @@ class Session
      */
     public function toArray()
     {
+        // Module code and staff were removed from the source, return empty
+        // values for these to maintain compatibility with clients expecting
+        // these keys in the response.
+
         return [
-            'module_code'   => $this->moduleCode,
+            'module_code'   => '',
             'module_name'   => $this->moduleName,
             'day'           => $this->day,
             'start'         => $this->start,
@@ -128,7 +123,7 @@ class Session
             'type'          => $this->type,
             'rooms'         => $this->rooms,
             'rooms_short'   => $this->roomsShort(),
-            'staff'         => $this->staff,        
+            'staff'         => [],
             'hash'          => $this->hash(),
             'is_valid'      => $this->isValid()
         ];
@@ -149,11 +144,12 @@ class Session
         if ($this->day != $other->day ||
             $this->start != $other->start ||
             $this->end != $other->end ||
-            $this->type != $other->type)
+            $this->type != $other->type){
             return false;
+        }
 
-        //check module code
-        if ($this->moduleCode == $other->moduleCode)
+        //check module
+        if ($this->moduleName == $other->moduleName)
             return true;
 
         //check for room intersection

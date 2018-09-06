@@ -105,7 +105,7 @@ Then navigate to [http://localhost:9000/courses](http://localhost:9000/courses)
     "sessions": 
 	[
 		{
-		    "module_code": "CIS018-1",
+		    "module_code": "", // Always empty
 		    "module_name": "Fundamentals Of Computer Studies",
 		    "day": 0,
 		    "start": "9:00",
@@ -121,10 +121,7 @@ Then navigate to [http://localhost:9000/courses](http://localhost:9000/courses)
 			[
 			    "C016"
 			],
-			"staff": 
-			[
-			    "Sue Brandreth"
-			],
+			"staff": [], // Always empty
 			"hash": "be39ce93b2a78f3b73b4e8cbe84559dc",
 			"is_valid": true
 		}
