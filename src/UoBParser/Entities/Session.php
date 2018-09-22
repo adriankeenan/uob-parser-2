@@ -96,10 +96,15 @@ class Session
      */
     public function hash()
     {
-        $attrKeys = ['moduleName', 'type', 'start', 'end', 'day'];
-        $attrVals = array_intersect_key(get_object_vars($this), array_flip($attrKeys));
-        $attrVals = array_values($attrVals);
-        return md5(implode('', $attrVals));
+        $values = [
+            $this->moduleName,
+            $this->type,
+            $this->day,
+            $this->start,
+            $this->end,
+        ];
+
+        return md5(implode('', $values));
     }
 
     /**

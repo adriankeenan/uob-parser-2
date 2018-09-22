@@ -35,8 +35,8 @@ class Course
 
         $url = $isHttps ? 'https://' : 'http://';
         $url .= $_SERVER['SERVER_NAME'];
-        $url .= $_SERVER['SERVER_PORT'] != '80' ? ':' . $_SERVER['SERVER_PORT'] : '';
-        $url .= dirname($_SERVER['PHP_SELF']);
+        $url .= in_array($_SERVER['SERVER_PORT'], [80, 443]) == false ? ':'.$_SERVER['SERVER_PORT'] : '';
+        $url .= rtrim(dirname($_SERVER['PHP_SELF']), '/');
         $url .= '/sessions?'.http_build_query($args);
 
         return $url;
