@@ -6,17 +6,16 @@ use \DOMDocument;
 use \DOMXpath;
 use \DateTime;
 use \Exception;
-
-class ParserException extends Exception { }
+use \InvalidArgumentException;
 
 class Parser
 {
-    private $debug;
+    private $version;
     private $startTime;
 
-    public function __construct($debug = false)
+    public function __construct($version=1)
     {
-        $this->debug = $debug;
+        $this->version = $version;
 
         libxml_use_internal_errors(true);
     }
@@ -39,22 +38,13 @@ class Parser
     {
         $timeTaken = microtime(true) - $this->startTime;
 
-        $isError = $data instanceof Exception;
-
         $outputData = [
+            'api_version' => $this->version,
             'response_time' => $timeTaken,
-            'error' => $isError
+            'error' => false,
         ];
 
-        if (is_array($data)){
-            $outputData = array_merge($outputData, $data);
-        } else if ($isError) {
-            $outputData['error_str'] = $data->getMessage();
-            if ($this->debug)
-                $outputData['exception'] = ExceptionJsonable::fromException($data)->toArray();
-        }
-
-        return $outputData;
+        return array_merge($outputData, $data);
     }
 
     /**
@@ -69,54 +59,59 @@ class Parser
     {
         $this->startTimer();
 
-        try {
+        //post data to get html string
+        $url = 'https://timetable.beds.ac.uk/sws'.Utils::yearString().'/showtimetable.asp';
 
-            //post data to get html string
-            $url = 'https://timetable.beds.ac.uk/sws'.Utils::yearString().'/showtimetable.asp';
+        //get the current term (estimated)
+        //then get relevant lbxWeeks
+        $termWeekRanges = [
+            1 => array_merge(range(6, 16), range(20, 23)),
+            2 => array_merge(range(24, 30), range(34, 41)),
+            3 => array_merge(range(42, 49), range(51, 54))
+        ];
 
-            //get the current term (estimated)
-            //then get relevant lbxWeeks
-            $termWeekRanges = [
-                1 => array_merge(range(6, 16), range(20, 23)),
-                2 => array_merge(range(24, 30), range(34, 41)),
-                3 => array_merge(range(42, 49), range(51, 54))
-            ];
+        $currentTermWeeks = $termWeekRanges[Utils::estimatedTerm()];
 
-            $currentTermWeeks = $termWeekRanges[Utils::estimatedTerm()];
+        $params = [
+            'ddlDepartments'        =>  $dept,
+            'ddlPosGroup'           =>  $level,
+            'lbxPos'                =>  $course,
+            'lbxWeeks'              =>  implode(';', $currentTermWeeks),
+            'ddlWeekdays'           =>  '1-7',
+            'ddlPeriods'            =>  '1-34',
+            'lstStyle'              =>  'textspreadsheet',
+            'btnShowTimetable'      =>  'View Timetable',
+            'ObjectClass'           =>  'programme of study',
+            'ObjectClassIdentifier' =>  'lbxPos',
+            'idtype'                =>  'id'
+        ];
 
-            $params = [
-                'ddlDepartments'        =>  $dept,
-                'ddlPosGroup'           =>  $level,
-                'lbxPos'                =>  $course,
-                'lbxWeeks'              =>  implode(';', $currentTermWeeks),
-                'ddlWeekdays'           =>  '1-7',
-                'ddlPeriods'            =>  '1-34',
-                'lstStyle'              =>  'textspreadsheet',
-                'btnShowTimetable'      =>  'View Timetable',
-                'ObjectClass'           =>  'programme of study',
-                'ObjectClassIdentifier' =>  'lbxPos',
-                'idtype'                =>  'id'
-            ];
-
-            try
-            {
-                $client = Utils::makeGuzzle();
-                $response = $client->request('POST', $url, ['form_params' => $params]);
-                $src = $response->getBody();
-            } catch (Exception $e) {
-                throw new ParserException('Server response error', 0, $e);
-            }
-
-            $sessions = $this->parseSessionDocument($src);
-
-            return $this->makeResponse([
-                'sessions'  =>  array_map(function($s){ return $s->toArray(); }, $sessions)
-            ]);
-
-        } catch (ParserException $e) {
-            return $this->makeResponse($e);
+        try
+        {
+            $client = Utils::makeGuzzle();
+            $response = $client->request('POST', $url, ['form_params' => $params]);
+            $src = $response->getBody();
+        } catch (Exception $e) {
+            throw new Exception('Server response error', 0, $e);
         }
 
+        $sessions = $this->parseSessionDocument($src);
+
+        return $this->makeResponse([
+            'sessions' => array_map(function($s){
+
+                $arr = $s->toArray();
+
+                // Add fields expected by clients running V1
+                if ($this->version == 1) {
+                    $arr['module_code'] = '';
+                    $arr['staff'] = [];
+                }
+
+                return $arr;
+
+            }, $sessions)
+        ]);
     }
 
     /**
@@ -129,7 +124,7 @@ class Parser
         //check for invalid session
         //page returns 200 on error, so check contents
         if (strpos($src, 'No Such Page') !== false)
-            throw new ParserException('Invalid course details');
+            throw new InvalidArgumentException('Invalid course details');
 
         $doc = new DOMDocument();
         $doc->loadHTML($src);
@@ -240,30 +235,23 @@ class Parser
     {
         $this->startTimer();
 
-        try {
+        $url = 'https://timetable.beds.ac.uk/sws'.Utils::yearString().'/js/data_autogen.js';
 
-            $url = 'https://timetable.beds.ac.uk/sws'.Utils::yearString().'/js/data_autogen.js';
-
-            try
-            {
-                $client = Utils::makeGuzzle();
-                $response = $client->request('GET', $url);
-                $src = $response->getBody();
-            } catch (Exception $e) {
-                throw new ParserException('Server response error', 0, $e);
-            }
-
-            $data = $this->parseCourseDocument($src);
-
-            return $this->makeResponse([
-                'courses'       =>  array_map(function($c){ return $c->toArray(); }, $data['courses']),
-                'departments'   =>  array_map(function($d){ return $d->toArray(); }, $data['departments'])
-            ]);
-
-        } catch (ParserException $e) {
-            return $this->makeResponse($e);
+        try
+        {
+            $client = Utils::makeGuzzle();
+            $response = $client->request('GET', $url);
+            $src = $response->getBody();
+        } catch (Exception $e) {
+            throw new Exception('Server response error', 0, $e);
         }
 
+        $data = $this->parseCourseDocument($src);
+
+        return $this->makeResponse([
+            'courses'       =>  array_map(function($c){ return $c->toArray(); }, $data['courses']),
+            'departments'   =>  array_map(function($d){ return $d->toArray(); }, $data['departments'])
+        ]);
     }
 
     /**

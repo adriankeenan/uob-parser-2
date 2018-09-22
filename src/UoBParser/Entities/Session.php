@@ -113,12 +113,7 @@ class Session
      */
     public function toArray()
     {
-        // Module code and staff were removed from the source, return empty
-        // values for these to maintain compatibility with clients expecting
-        // these keys in the response.
-
         return [
-            'module_code'   => '',
             'module_name'   => $this->moduleName,
             'day'           => $this->day,
             'start'         => $this->start,
@@ -128,7 +123,6 @@ class Session
             'type'          => $this->type,
             'rooms'         => $this->rooms,
             'rooms_short'   => $this->roomsShort(),
-            'staff'         => [],
             'hash'          => $this->hash(),
             'is_valid'      => $this->isValid()
         ];
