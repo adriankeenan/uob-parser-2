@@ -2,6 +2,8 @@
 
 A JSON API for the University of Bedfordshire timetable system.
 
+Try it out here: https://uob-timetable-api.adriankeenan.co.uk
+
 Built using:
 
 - [Slim](https://github.com/slimphp/Slim)
