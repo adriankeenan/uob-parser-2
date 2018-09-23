@@ -250,7 +250,8 @@ class Parser
 
         return $this->makeResponse([
             'courses'       =>  array_map(function($c){ return $c->toArray(); }, $data['courses']),
-            'departments'   =>  array_map(function($d){ return $d->toArray(); }, $data['departments'])
+            'departments'   =>  array_map(function($d){ return $d->toArray(); }, $data['departments']),
+            'levels'        =>  array_map(function($l){ return $l->toArray(); }, $data['levels']),
         ]);
     }
 
@@ -264,6 +265,7 @@ class Parser
     {
         $depts      = [];
         $courses    = [];
+        $levels     = [];
 
         $src = iconv('UTF-8', 'ISO-8859-1//IGNORE', $src);
         $lines = explode(PHP_EOL, $src);
@@ -290,6 +292,11 @@ class Parser
                     continue;
 
                 $courses[] = new Entities\Course($l[2], $l[1], $l[4], $l[3]);
+            }
+            //levels
+            else if (strstr($line, 'posgrouparray[i++] = new posgroup'))
+            {
+                $levels[] = new Entities\Level($l[0]);
             }
         }
 
@@ -328,10 +335,12 @@ class Parser
 
         usort($depts, $sortalpha);
         usort($courses, $sortalpha);
+        usort($levels, $sortalpha);
 
         return [
             'courses'       =>  $courses,
-            'departments'   =>  $depts
+            'departments'   =>  $depts,
+            'levels'        =>  $levels,
         ];
     }
 }

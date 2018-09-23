@@ -72,6 +72,7 @@ Some sessions which are available in many rooms are split in to different entrie
         }
       }
       ["departments"]=>
+      array(16) {
         [6]=>
         array(3) {
           ["id"]=>
@@ -80,6 +81,14 @@ Some sessions which are available in many rooms are split in to different entrie
           string(41) "School of Computer Science and Technology"
           ["course_count"]=>
           int(581)
+        }
+      }
+      ["levels"]=>
+      array(8) {
+        [4]=>
+        array(1) {
+          ["name"]=>
+          string(20) "Undergraduate Year 1"
         }
       }
     }
@@ -169,6 +178,11 @@ Endpoints:
                 "id": "12600",
                 "name": "Department of Computer Science and Technology",
                 "course_count": 581
+            }
+        ],
+        "levels": [
+            {
+                "name": "Undergraduate Year 1"
             }
         ]
     }
