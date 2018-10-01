@@ -21,6 +21,7 @@ function exceptionToArray($exception){
         'class' => get_class($exception),
         'message' => $exception->getMessage(),
         'code' => $exception->getCode(),
+        'id' => $exception instanceof \UoBParser\Error ? $exception->getID() : null,
         'file' => $exception->getFile(),
         'line' => $exception->getLine(),
         'previous' => exceptionToArray($exception->getPrevious()),
@@ -63,6 +64,7 @@ $container['errorHandler'] = function($container) {
         $data = [
             'error' => true,
             'error_str' => $exception->getMessage(),
+            'error_id' => $exception instanceof \UoBParser\Error ? $exception->getID() : null,
         ];
 
         // If debug enabled, add exception data

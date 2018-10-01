@@ -6,10 +6,14 @@ use \DOMDocument;
 use \DOMXpath;
 use \DateTime;
 use \Exception;
-use \InvalidArgumentException;
 
 class Parser
 {
+    const ERROR_UNEXPECTED = 'unexpected';
+    const ERROR_SERVER_COMMUNICATION = 'server_communication';
+    const ERROR_SERVER_RESPONSE = 'server_response_invalid';
+    const ERROR_COURSE_INVALID = 'course_invalid';
+
     private $version;
     private $startTime;
 
@@ -31,7 +35,7 @@ class Parser
 
     /**
      * Generate an array based on either valid output data or an exception
-     * @param array|Exception $data
+     * @param array $data
      * @return array
      */
     public function makeResponse($data)
@@ -59,59 +63,65 @@ class Parser
     {
         $this->startTimer();
 
-        //post data to get html string
-        $url = 'https://timetable.beds.ac.uk/sws'.Utils::yearString().'/showtimetable.asp';
+        try {
+            //post data to get html string
+            $url = 'https://timetable.beds.ac.uk/sws'.Utils::yearString().'/showtimetable.asp';
 
-        //get the current term (estimated)
-        //then get relevant lbxWeeks
-        $termWeekRanges = [
-            1 => array_merge(range(6, 16), range(20, 23)),
-            2 => array_merge(range(24, 30), range(34, 41)),
-            3 => array_merge(range(42, 49), range(51, 54))
-        ];
+            //get the current term (estimated)
+            //then get relevant lbxWeeks
+            $termWeekRanges = [
+                1 => array_merge(range(6, 16), range(20, 23)),
+                2 => array_merge(range(24, 30), range(34, 41)),
+                3 => array_merge(range(42, 49), range(51, 54))
+            ];
 
-        $currentTermWeeks = $termWeekRanges[Utils::estimatedTerm()];
+            $currentTermWeeks = $termWeekRanges[Utils::estimatedTerm()];
 
-        $params = [
-            'ddlDepartments'        =>  $dept,
-            'ddlPosGroup'           =>  $level,
-            'lbxPos'                =>  $course,
-            'lbxWeeks'              =>  implode(';', $currentTermWeeks),
-            'ddlWeekdays'           =>  '1-7',
-            'ddlPeriods'            =>  '1-34',
-            'lstStyle'              =>  'textspreadsheet',
-            'btnShowTimetable'      =>  'View Timetable',
-            'ObjectClass'           =>  'programme of study',
-            'ObjectClassIdentifier' =>  'lbxPos',
-            'idtype'                =>  'id'
-        ];
+            $params = [
+                'ddlDepartments'        =>  $dept,
+                'ddlPosGroup'           =>  $level,
+                'lbxPos'                =>  $course,
+                'lbxWeeks'              =>  implode(';', $currentTermWeeks),
+                'ddlWeekdays'           =>  '1-7',
+                'ddlPeriods'            =>  '1-34',
+                'lstStyle'              =>  'textspreadsheet',
+                'btnShowTimetable'      =>  'View Timetable',
+                'ObjectClass'           =>  'programme of study',
+                'ObjectClassIdentifier' =>  'lbxPos',
+                'idtype'                =>  'id'
+            ];
 
-        try
-        {
-            $client = Utils::makeGuzzle();
-            $response = $client->request('POST', $url, ['form_params' => $params]);
-            $src = $response->getBody();
+            try
+            {
+                $client = Utils::makeGuzzle();
+                $response = $client->request('POST', $url, ['form_params' => $params]);
+                $src = $response->getBody();
+            } catch (Exception $e) {
+                throw new Error('Server response error', self::ERROR_SERVER_COMMUNICATION);
+            }
+
+            $sessions = $this->parseSessionDocument($src);
+
+            return $this->makeResponse([
+                'sessions' => array_map(function($s){
+
+                    $arr = $s->toArray();
+
+                    // Add fields expected by clients running V1
+                    if ($this->version == 1) {
+                        $arr['module_code'] = '';
+                        $arr['staff'] = [];
+                    }
+
+                    return $arr;
+
+                }, $sessions)
+            ]);
+        } catch (Error $e) {
+            throw $e;
         } catch (Exception $e) {
-            throw new Exception('Server response error', 0, $e);
+            throw new Error('Unexpected error occured', self::ERROR_UNEXPECTED, 500, $e);
         }
-
-        $sessions = $this->parseSessionDocument($src);
-
-        return $this->makeResponse([
-            'sessions' => array_map(function($s){
-
-                $arr = $s->toArray();
-
-                // Add fields expected by clients running V1
-                if ($this->version == 1) {
-                    $arr['module_code'] = '';
-                    $arr['staff'] = [];
-                }
-
-                return $arr;
-
-            }, $sessions)
-        ]);
     }
 
     /**
@@ -124,7 +134,7 @@ class Parser
         //check for invalid session
         //page returns 200 on error, so check contents
         if (strpos($src, 'No Such Page') !== false)
-            throw new InvalidArgumentException('Invalid course details');
+            throw new Error('Invalid course details', self::ERROR_COURSE_INVALID);
 
         $doc = new DOMDocument();
         $doc->loadHTML($src);
@@ -235,24 +245,30 @@ class Parser
     {
         $this->startTimer();
 
-        $url = 'https://timetable.beds.ac.uk/sws'.Utils::yearString().'/js/data_autogen.js';
+        try {
+            $url = 'https://timetable.beds.ac.uk/sws'.Utils::yearString().'/js/data_autogen.js';
 
-        try
-        {
-            $client = Utils::makeGuzzle();
-            $response = $client->request('GET', $url);
-            $src = $response->getBody();
+            try
+            {
+                $client = Utils::makeGuzzle();
+                $response = $client->request('GET', $url);
+                $src = $response->getBody();
+            } catch (Exception $e) {
+                throw new Error('Server communication error', self::ERROR_SERVER_COMMUNICATION);
+            }
+
+            $data = $this->parseCourseDocument($src);
+
+            return $this->makeResponse([
+                'courses'       =>  array_map(function($c){ return $c->toArray(); }, $data['courses']),
+                'departments'   =>  array_map(function($d){ return $d->toArray(); }, $data['departments']),
+                'levels'        =>  array_map(function($l){ return $l->toArray(); }, $data['levels']),
+            ]);
+        } catch (Error $e) {
+            throw $e;
         } catch (Exception $e) {
-            throw new Exception('Server response error', 0, $e);
+            throw new Error('Unexpected error occured', self::ERROR_UNEXPECTED, 500, $e);
         }
-
-        $data = $this->parseCourseDocument($src);
-
-        return $this->makeResponse([
-            'courses'       =>  array_map(function($c){ return $c->toArray(); }, $data['courses']),
-            'departments'   =>  array_map(function($d){ return $d->toArray(); }, $data['departments']),
-            'levels'        =>  array_map(function($l){ return $l->toArray(); }, $data['levels']),
-        ]);
     }
 
     /**
@@ -326,7 +342,7 @@ class Parser
         }
 
         if (count($depts) == 0 || count($courses) == 0)
-            throw new ParserException('No data returned');
+            throw new Error('No data returned', self::ERROR_SERVER_RESPONSE);
 
         //alpha sort arrays by name
         $sortalpha = function($a, $b){

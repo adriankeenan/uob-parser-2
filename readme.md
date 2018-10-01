@@ -232,12 +232,16 @@ Sucessful requests will contain the requested version in the response `api_versi
 
 #### Errors
 
-Error responses will contain `error` set to true and an error reason in `error_str`, as well as a non-200 response code.
+Error responses will contain
+- `error` set to true
+- `error_str` - Human readible error string
+- `error_id` - ID for expected exceptions (values defined [here](src/UoBParser/Parser.php))
 
 ```
 {
     "error": true,
-    "error_str": "Invalid course details"
+    "error_str": "Invalid course details",
+    "error_id": "course_invalid"
 }
 ```
 
@@ -247,8 +251,9 @@ If the application is started in debug mode (`UOB_PARSER_DEBUG=1` in env), the e
 {
     ...
     "exception": {
-        "class": "InvalidArgumentException",
+        "class": "UoBParser\Error",
         "message": "Invalid course details",
+        "id": "course_invalid",
         "code": 0,
         "file": "/.../uob-parser-2/src/UoBParser/Parser.php",
         "line": 128,
