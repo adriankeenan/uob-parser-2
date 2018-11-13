@@ -24,6 +24,16 @@ class Session
     }
 
     /**
+     * Get the day of week as a string
+     * @return string
+     */
+    public function dayName()
+    {
+        $days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+        return $days[$this->day];
+    }
+
+    /**
      * Get the duration of the session in hours
      * @return int|float
      */
@@ -116,6 +126,7 @@ class Session
         return [
             'module_name'   => $this->moduleName,
             'day'           => $this->day,
+            'day_name'      => $this->dayName(),
             'start'         => $this->start,
             'end'           => $this->end,
             'length'        => $this->length(),

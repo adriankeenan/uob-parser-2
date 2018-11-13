@@ -118,6 +118,8 @@ Some sessions which are available in many rooms are split in to different entrie
           string(32) "Fundamentals Of Computer Studies"
           ["day"]=>
           int(0)
+          ["day_name"]=>
+          string(6) "Monday"
           ["start"]=>
           string(4) "9:00"
           ["end"]=>
