@@ -200,10 +200,12 @@ Endpoints:
         "api_version": 2,
         "response_time": 1.2430939674377,
         "error": false,
+        "timetable_url": "https://timetable.beds.ac.uk/sws1819",
         "sessions": [
             {
                 "module_name": "Fundamentals Of Computer Studies",
                 "day": 0,
+                "day_name": "Monday",
                 "start": "9:00",
                 "end": "11:00",
                 "length": 2,
