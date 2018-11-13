@@ -65,7 +65,8 @@ class Parser
 
         try {
             //post data to get html string
-            $url = 'https://timetable.beds.ac.uk/sws'.Utils::yearString().'/showtimetable.asp';
+            $timetable_url = 'https://timetable.beds.ac.uk/sws'.Utils::yearString();
+            $timetable_post_url = $timetable_url.'/showtimetable.asp';
 
             //get the current term (estimated)
             //then get relevant lbxWeeks
@@ -94,7 +95,7 @@ class Parser
             try
             {
                 $client = Utils::makeGuzzle();
-                $response = $client->request('POST', $url, ['form_params' => $params]);
+                $response = $client->request('POST', $timetable_post_url, ['form_params' => $params]);
                 $src = $response->getBody();
             } catch (Exception $e) {
                 throw new Error('Server response error', self::ERROR_SERVER_COMMUNICATION);
@@ -103,6 +104,7 @@ class Parser
             $sessions = $this->parseSessionDocument($src);
 
             return $this->makeResponse([
+                'timetable_url' => $timetable_url,
                 'sessions' => array_map(function($s){
 
                     $arr = $s->toArray();
@@ -115,7 +117,7 @@ class Parser
 
                     return $arr;
 
-                }, $sessions)
+                }, $sessions),
             ]);
         } catch (Error $e) {
             throw $e;

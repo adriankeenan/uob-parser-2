@@ -108,6 +108,8 @@ Some sessions which are available in many rooms are split in to different entrie
       float(1.1677050590515)
       ["error"]=>
       bool(false)
+      ["timetable_url"]=>
+      string(36) "https://timetable.beds.ac.uk/sws1819"
       ["sessions"]=>
       array(21) {
         [0]=>
