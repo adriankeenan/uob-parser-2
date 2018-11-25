@@ -28,7 +28,7 @@ class Utils
      */
     public static function estimatedTerm()
     {
-        //date ranges
+        // Date ranges
         $termRanges = [
             ['term' => 1, 'start' => ['month' => 9, 'date' => 1], 'end' => ['month' => 12, 'date' => 15]],
             ['term' => 2, 'start' => ['month' => 12, 'date' => 15], 'end' => ['month' => 12, 'date' => 31]],
@@ -36,7 +36,7 @@ class Utils
             ['term' => 3, 'start' => ['month' => 3, 'date' => 20], 'end' => ['month' => 9, 'date' => 1]]
         ];
 
-        //get current range
+        // Get current range
         $termNumber = 0;
         $year = intval((new DateTime())->format('Y'));
 

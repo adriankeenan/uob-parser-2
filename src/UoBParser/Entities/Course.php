@@ -2,23 +2,31 @@
 
 namespace UoBParser\Entities;
 
-use \Exception;
-
 class Course
 {
     public $id;
     public $name;
     public $level;
-    public $deptId;
+    public $departmentId;
+
+    /**
+     * @var Department|null
+     */
     public $department;
 
-    function __construct($id, $name, $level, $deptId)
+    /**
+     * @param string $id Course ID
+     * @param string $name Course name
+     * @param string $level Course level
+     * @param string $departmentId Course department ID
+     */
+    function __construct($id, $name, $level, $departmentId)
     {
         $this->id = $id;
         $this->name = $name;
         $this->level = $level;
-        $this->deptId = $deptId;
-        $this->department = false;
+        $this->departmentId = $departmentId;
+        $this->department = null;
     }
 
     /**
@@ -68,10 +76,10 @@ class Course
     {
         $nameChunks = $this->nameChunks();
        
-        $names['name_start'] = $nameChunks[0];
-        $names['name_end'] = implode(' - ', array_slice($nameChunks, 1));
-
-        return $names;
+        return [
+            'name_start' => $nameChunks[0],
+            'name_end' => implode(' - ', array_slice($nameChunks, 1)),
+        ];
     }
 
     /**
@@ -84,7 +92,7 @@ class Course
             'id'            => $this->id,
             'name'          => $this->name,
             'level'         => $this->level,
-            'department'    => $this->department ? $this->department->toArray() : null,
+            'department'    => $this->department instanceof Department ? $this->department->toArray() : null,
         ];
 
         return array_merge($data, $this->names());

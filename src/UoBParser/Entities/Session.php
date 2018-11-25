@@ -13,6 +13,14 @@ class Session
     public $end;
     public $rooms;
 
+    /**
+     * @param string $moduleName Module name
+     * @param string $type Session tyle (eg Lecture, Practical etc)
+     * @param integer $day Day of week as an integer (0 to 4, Monday to Friday)
+     * @param string $start Start time in HH:MM format
+     * @param string $end  End time in HH:MM format
+     * @param array $rooms List of rooms
+     */
     function __construct($moduleName, $type, $day, $start, $end, $rooms)
     {
         $this->moduleName = $moduleName;
@@ -114,6 +122,7 @@ class Session
             $this->end,
         ];
 
+        // Potential for collissions - consider serialising as JSON before hashing
         return md5(implode('', $values));
     }
 
@@ -140,17 +149,17 @@ class Session
     }
 
     /**
-     * Determine whether two sessions are equal.
+     * Determine whether two sessions are considered equal.
      * @param object $other
      * @return bool
      */
     public function equals($other)
     {
-        //check for equality using standard attributes (times, type) and either
-        //the module (which may be blank) or room intersection, as two different
-        //sessions wont be happening in the same room.
+        // Check for equality using standard attributes (day, times, type) and either
+        // the module (which may be blank) or room intersection, as two different
+        // sessions wont be happening in the same room.
 
-        //check for same day, type, start, end
+        // Check for same day, type, start, end
         if ($this->day != $other->day ||
             $this->start != $other->start ||
             $this->end != $other->end ||
@@ -158,11 +167,11 @@ class Session
             return false;
         }
 
-        //check module
+        // Check for same module
         if ($this->moduleName == $other->moduleName)
             return true;
 
-        //check for room intersection
+        // Check for room
         if (empty(array_intersect($this->rooms, $other->rooms)) == false)
             return true;
 

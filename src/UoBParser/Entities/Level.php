@@ -6,6 +6,9 @@ class Level
 {
     public $name;
 
+    /**
+     * @param string $name Level name
+     */
     function __construct($name)
     {
         $this->name = $name;

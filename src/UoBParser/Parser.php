@@ -4,7 +4,6 @@ namespace UoBParser;
 
 use \DOMDocument;
 use \DOMXpath;
-use \DateTime;
 use \Exception;
 
 class Parser
@@ -57,6 +56,7 @@ class Parser
      * @param string $dept Department for course
      * @param string $course Department for course
      * @param string $level Level for course
+     * @throws Error
      * @return array
      */
     public function getSessions($dept, $course, $level)
@@ -64,18 +64,18 @@ class Parser
         $this->startTimer();
 
         try {
-            //post data to get html string
-            $timetable_url = 'https://timetable.beds.ac.uk/sws'.Utils::yearString();
-            $timetable_post_url = $timetable_url.'/showtimetable.asp';
+            // Build POST URL string
+            $url = 'https://timetable.beds.ac.uk/sws'.Utils::yearString().'/showtimetable.asp';
 
-            //get the current term (estimated)
-            //then get relevant lbxWeeks
+            // Get the current term (estimated)
             $termWeekRanges = [
                 1 => array_merge(range(6, 16), range(20, 23)),
                 2 => array_merge(range(24, 30), range(34, 41)),
                 3 => array_merge(range(42, 49), range(51, 54))
             ];
 
+            // Get relevant lbxWeeks for term. Honestly not really how this gets generated,
+            // just using observed values.
             $currentTermWeeks = $termWeekRanges[Utils::estimatedTerm()];
 
             $params = [
@@ -95,7 +95,7 @@ class Parser
             try
             {
                 $client = Utils::makeGuzzle();
-                $response = $client->request('POST', $timetable_post_url, ['form_params' => $params]);
+                $response = $client->request('POST', $url, ['form_params' => $params]);
                 $src = $response->getBody();
             } catch (Exception $e) {
                 throw new Error('Server response error', self::ERROR_SERVER_COMMUNICATION);
@@ -104,7 +104,6 @@ class Parser
             $sessions = $this->parseSessionDocument($src);
 
             return $this->makeResponse([
-                'timetable_url' => $timetable_url,
                 'sessions' => array_map(function($s){
 
                     $arr = $s->toArray();
@@ -117,7 +116,7 @@ class Parser
 
                     return $arr;
 
-                }, $sessions),
+                }, $sessions)
             ]);
         } catch (Error $e) {
             throw $e;
@@ -129,12 +128,11 @@ class Parser
     /**
      * Get a list of session objects from the source HTML
      * @param string $src HTLM source
-     * @return array[Entities\Session]
+     * @return array<Entities\Session>
      */
     public function parseSessionDocument($src)
     {
-        //check for invalid session
-        //page returns 200 on error, so check contents
+        // Check for invalid session. Page returns 200 on error, so check contents.
         if (strpos($src, 'No Such Page') !== false)
             throw new Error('Invalid course details', self::ERROR_COURSE_INVALID);
 
@@ -143,21 +141,25 @@ class Parser
 
         $xpath = new DOMXpath($doc);
 
-        //collection of DOM elements of type 'table' with 'spreadsheet' class
+        // Each table with class spreadsheet contains the timetable for a given day.
+        // Should be 5 entries (Monday to Friday).
         $tables = $xpath->query("//table[@class='spreadsheet']");
 
         $sessions = [];
 
-        //iterate through tables
+        // Iterate through tables
         for ($i = 0; $i < $tables->length; $i++)
         {
-            //get table
+            // Get table for day
             $table = $tables->item($i);
 
-            //get rows
+            // Get rows in table
+            // DOMNode::getElementsByTagName() is undocumented,
+            // see http://php.net/manual/en/class.domnode.php
+            // @phan-suppress-next-line PhanUndeclaredMethod
             $rows = $table->getElementsByTagName('tr');
 
-            //less than 2 rows for no content or header only
+            // Less than 2 rows for no content or header only
             if ($rows->length < 2)
                 continue;
 
@@ -171,16 +173,19 @@ class Parser
                 $columnMap[$cellText] = $index;
             }
 
-            //start from second row
+            // Iterate through rows, staring at index 1 (skipping header)
             for ($r = 1; $r < $rows->length; $r++)
             {
-                //get row
+                // Get row
                 $row = $rows->item($r);
 
-                //get collection of cells
+                // Get collection of cells
                 $cells = $row->getElementsByTagName('td');
 
-                //get values
+                // Get values from cells
+
+                // Determine the current day based on the table index
+                $day = $i;
 
                 $moduleName = '';
                 if (isset($columnMap['Title'])){
@@ -192,8 +197,6 @@ class Parser
                 $type = '';
                 if (isset($columnMap['Type']))
                     $type = $cells->item($columnMap['Type'])->nodeValue;
-
-                $day = $i;
 
                 $start = '';
                 if (isset($columnMap['Start']))
@@ -207,7 +210,7 @@ class Parser
                 if (isset($columnMap['Room']))
                     $rooms = explode(',', $cells->item($columnMap['Room'])->nodeValue);
 
-                //build session object
+                // Create session object
                 $session = new Entities\Session(
                     $moduleName,
                     $type,
@@ -217,10 +220,12 @@ class Parser
                     $rooms
                 );
 
-                //assume session is new unless duplicate found
+                // We need to check whether this session is an extension of an existing
+                // session before adding it to the list
                 $newSession = true;
 
-                //loop sessions
+                // Search existing sessions for a match, and update the existing session
+                // if found
                 foreach ($sessions as $other)
                 {
                     if ($other->equals($session)){
@@ -229,7 +234,7 @@ class Parser
                     }
                 }
 
-                //add if session is new
+                // Add to list if this is a new session
                 if ($newSession)
                     $sessions[] = $session;
             }
@@ -241,6 +246,7 @@ class Parser
     /**
      * Download the metadata javascript file and return a response array
      * containing the courses and departments
+     * @throws Error
      * @return array
      */
     public function getCourses()
@@ -248,6 +254,7 @@ class Parser
         $this->startTimer();
 
         try {
+            // Build generated JavaScript URL
             $url = 'https://timetable.beds.ac.uk/sws'.Utils::yearString().'/js/data_autogen.js';
 
             try
@@ -303,61 +310,69 @@ class Parser
      */
     public function parseCourseDocument($src)
     {
-        $depts      = [];
-        $courses    = [];
-        $levels     = [];
+        $depts = [];
+        $courses = [];
+        $levels = [];
 
         $src = iconv('UTF-8', 'ISO-8859-1//IGNORE', $src);
         $lines = explode(PHP_EOL, $src);
 
+        // Read the JS file one line at a time. Each line that we are interested in
+        // constructs a new JS object and adds it to an array. We'll read each line,
+        // determine which type of object is being created, then parse the call to
+        // the constructor to get the data.
         foreach ($lines as $line)
         {
-            //get everything between brackets
-            $s = strpos($line, '(') + 1;
-            $e = strripos($line, ')');
-            $str = substr($line, $s,  $e - $s);
+            // Get the text between the first and last brackets in the line string
+            $firstBracketPosition = strpos($line, '(') + 1;
+            $lastBracketPosition = strrpos($line, ')');
+            $str = substr($line, $firstBracketPosition,  $lastBracketPosition - $firstBracketPosition);
 
-            //split as CSV
-            $l = str_getcsv($str, ',', '"');
+            // Parse the text as a CSV. This works because the constructor data is
+            // always only strings or integers
+            $parts = str_getcsv($str, ',', '"');
 
-            //departments
+            // Determine the type of each line and parse as appropriate
+
+            // Line is a department
             if (strstr($line, 'deptarray[i++] = new dept'))
             {
-                $depts[] = new Entities\Department($l[2], $l[0]);
+                $depts[] = new Entities\Department($parts[2], $parts[0]);
             }
-            //courses
+            // Line is a course
             else if (strstr($line, 'posarray[i++] = new pos'))
             {
-                if (trim($l[1]) == '')
+                // Some course entries are invalid and have no name, ignore these
+                if (trim($parts[1]) == '')
                     continue;
 
-                $courses[] = new Entities\Course($l[2], $l[1], $l[4], $l[3]);
+                $courses[] = new Entities\Course($parts[2], $parts[1], $parts[4], $parts[3]);
             }
-            //levels
+            // Line is a level
             else if (strstr($line, 'posgrouparray[i++] = new posgroup'))
             {
-                $levels[] = new Entities\Level($l[0]);
+                $levels[] = new Entities\Level($parts[0]);
             }
         }
 
-        //set the course count for each department
+        // Set the course count for each department
         foreach ($depts as $department)
         {
             $department->courseCount = 0;
 
             foreach ($courses as $course)
             {
-                if ($course->deptId == $department->id)
+                if ($course->departmentId == $department->id)
                     $department->courseCount++;
             }
         }
 
-        //set the course department using department array
+        // Set the department for each course
         foreach ($courses as $course)
         {
             foreach ($depts as $department)
             {
-                if ($course->deptId == $department->id)
+                if ($course->departmentId == $department->id)
                 {
                     $course->department = $department;
                     break;
@@ -365,10 +380,11 @@ class Parser
             }
         }
 
+        // Check that the data appears to be valid
         if (count($depts) == 0 || count($courses) == 0)
             throw new Error('No data returned', self::ERROR_SERVER_RESPONSE);
 
-        //alpha sort arrays by name
+        // Alpha sort arrays by name
         $sortalpha = function($a, $b){
             return strcasecmp($a->name, $b->name);
         };

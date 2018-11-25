@@ -8,6 +8,10 @@ class Department
     public $name;
     public $courseCount;
 
+    /**
+     * @param string $id Department ID
+     * @param string $name Department name
+     */
     public function __construct($id, $name)
     {
         $this->id = $id;
