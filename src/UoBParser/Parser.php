@@ -262,9 +262,31 @@ class Parser
             $data = $this->parseCourseDocument($src);
 
             return $this->makeResponse([
-                'courses'       =>  array_map(function($c){ return $c->toArray(); }, $data['courses']),
-                'departments'   =>  array_map(function($d){ return $d->toArray(); }, $data['departments']),
-                'levels'        =>  array_map(function($l){ return $l->toArray(); }, $data['levels']),
+                'courses' =>  array_map(function($course){ 
+                    $course = $course->toArray();
+                    
+                    if (isset($_SERVER['SERVER_NAME'])) {
+                        $args = [
+                            'dept' => $course['department']['id'],
+                            'course' => $course['id'],
+                            'level' => $course['level'],
+                        ];
+
+                        $isHttps = empty($_SERVER['HTTPS']) == false && $_SERVER['HTTPS'] != 'off';
+
+                        $url = $isHttps ? 'https://' : 'http://';
+                        $url .= $_SERVER['SERVER_NAME'];
+                        $url .= in_array($_SERVER['SERVER_PORT'], [80, 443]) == false ? ':'.$_SERVER['SERVER_PORT'] : '';
+                        $url .= rtrim(dirname($_SERVER['PHP_SELF']), '/');
+                        $url .= '/sessions?'.http_build_query($args);
+
+                        $course['session_url'] = $url;
+                    }
+
+                    return $course;
+                }, $data['courses']),
+                'departments' =>  $this->objectsToArrays($data['departments']),
+                'levels' => $this->objectsToArrays($data['levels']),
             ]);
         } catch (Error $e) {
             throw $e;
@@ -360,5 +382,10 @@ class Parser
             'departments'   =>  $depts,
             'levels'        =>  $levels,
         ];
+    }
+
+    private function objectsToArrays(array $objects): array
+    {
+        return array_map(function($object){ return $object->toArray(); }, $objects);
     }
 }

@@ -13,7 +13,7 @@ Built using:
 
 Requirements:
 
-- PHP 5.5
+- PHP 7.1
 - Composer
 
 ## Preamble
@@ -25,6 +25,11 @@ Departments, courses and other options available on the timetable web page are p
 There are some sessions which have no module name when viewed in the `List` view (but strangely they are present in the `Grid` view). Sessions objects are returned with a boolean `is_valid` field to denote whether they are missing this information, which client applications can then use to determine whether to show a warning.
 
 Some sessions which are available in many rooms are split in to different entries in the `List` view. The parser logic will combine these entries in a single session with all rooms listed.
+
+## Testing
+
+- Run the [PHPUnit](https://github.com/sebastianbergmann/phpunit) test suite with `composer test`
+- Run static analysis using [Phan](https://github.com/phan/phan) with `composer phan`
 
 ## Usage
 

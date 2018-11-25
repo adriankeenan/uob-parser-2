@@ -22,27 +22,6 @@ class Course
     }
 
     /**
-     * Get the url to access the sessions for this course
-     * @return string
-     */
-    public function sessionUrl()
-    {
-        $args['dept'] = $this->deptId;
-        $args['course'] = $this->id;
-        $args['level'] = $this->level;
-
-        $isHttps = empty($_SERVER['HTTPS']) == false && $_SERVER['HTTPS'] != 'off';
-
-        $url = $isHttps ? 'https://' : 'http://';
-        $url .= $_SERVER['SERVER_NAME'];
-        $url .= in_array($_SERVER['SERVER_PORT'], [80, 443]) == false ? ':'.$_SERVER['SERVER_PORT'] : '';
-        $url .= rtrim(dirname($_SERVER['PHP_SELF']), '/');
-        $url .= '/sessions?'.http_build_query($args);
-
-        return $url;
-    }
-
-    /**
      * Split name in to chunks
      * Parse the string so that it isn't split by '-' between brackets
      * @return array
@@ -106,8 +85,6 @@ class Course
             'name'          => $this->name,
             'level'         => $this->level,
             'department'    => $this->department ? $this->department->toArray() : null,
-            'session_url'   => $this->sessionUrl(),
-
         ];
 
         return array_merge($data, $this->names());

@@ -74,7 +74,7 @@ class Session
     public function roomsShort()
     {
         return array_map(function($r){
-            $pattern = '/^(([a-zA-Z]{1,}[\d]{1,}[a-zA-Z]{0,})|([a-zA-Z])[0-9]{1,}.[0-9]{1,})\s-/';
+            $pattern = '/^([A-Z0-9.]+)\s-/';
             $matches = [];
             if (preg_match($pattern, $r, $matches))
                 return $matches[1];
@@ -86,10 +86,10 @@ class Session
      * Add the attributes of another session to this session.
      * This is useful when the same session is listed multiple times but with
      * different rooms.
-     * @param object $other
-     * @return object
+     * @param Session $other
+     * @return Session This instance
      */
-    public function combine($other)
+    public function combine(Session $other)
     {
         if (strlen($this->moduleName) == 0)
             $this->moduleName = $other->moduleName;
