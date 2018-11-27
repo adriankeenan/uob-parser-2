@@ -2,8 +2,6 @@
 
 namespace UoBParser\Entities;
 
-use \DateTime;
-
 class Session
 {
     public $moduleName;
@@ -47,11 +45,13 @@ class Session
      */
     public function length()
     {
-        $dateStart = DateTime::createFromFormat('H:i', $this->start);
-        $dateEnd = DateTime::createFromFormat('H:i', $this->end);
-        $seconds = $dateEnd->getTimestamp() - $dateStart->getTimestamp();
-        $hours = $seconds / 60 /60;
-        return $hours;
+        $startParts = explode(':', $this->start);
+        $startMinutes = $startParts[0] * 60 + $startParts[1];
+
+        $endParts = explode(':', $this->end);
+        $endMinutes = $endParts[0] * 60 + $endParts[1];
+
+        return ($endMinutes - $startMinutes) / 60;
     }
 
     /**
