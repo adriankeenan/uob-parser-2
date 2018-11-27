@@ -1,5 +1,7 @@
 # uob-parser-2
 
+[![Build Status](https://travis-ci.com/adriankeenan/uob-parser-2.svg?branch=master)](https://travis-ci.com/adriankeenan/uob-parser-2)
+
 A JSON API for the University of Bedfordshire timetable system.
 
 Try it out here: https://uob-timetable-api.adriankeenan.co.uk
