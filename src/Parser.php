@@ -70,7 +70,7 @@ class Parser
             // Get the current term (estimated)
             $termWeekRanges = [
                 1 => array_merge(range(6, 16), range(20, 23)),
-                2 => array_merge(range(24, 30), range(34, 41)),
+                2 => array_merge(range(24, 33), range(37, 41)),
                 3 => array_merge(range(42, 49), range(51, 54))
             ];
 
