@@ -43,7 +43,7 @@ class Parser
 
         $outputData = [
             'api_version' => $this->version,
-            'response_time' => $timeTaken,
+            'response_time' => floatval(sprintf('%.2f', $timeTaken)),
             'error' => false,
         ];
 

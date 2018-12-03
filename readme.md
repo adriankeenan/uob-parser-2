@@ -48,7 +48,7 @@ Some sessions which are available in many rooms are split in to different entrie
       ["api_version"]=>
       int(1)
       ["response_time"]=>
-      float(0.80002999305725)
+      float(0.8)
       ["error"]=>
       bool(false)
       ["courses"]=>
@@ -112,7 +112,7 @@ Some sessions which are available in many rooms are split in to different entrie
       ["api_version"]=>
       int(2)
       ["response_time"]=>
-      float(1.1677050590515)
+      float(1.17)
       ["error"]=>
       bool(false)
       ["timetable_url"]=>
@@ -167,7 +167,7 @@ Endpoints:
     ```
     {
         "api_version": 2,
-        "response_time": 0.69508790969849,
+        "response_time": 0.7,
         "error": false,
         "courses": [
             {
@@ -205,7 +205,7 @@ Endpoints:
     ```
     {
         "api_version": 2,
-        "response_time": 1.2430939674377,
+        "response_time": 1.24,
         "error": false,
         "timetable_url": "https://timetable.beds.ac.uk/sws1819",
         "sessions": [
