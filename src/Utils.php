@@ -2,22 +2,41 @@
 
 namespace UoBParser;
 
-use \DateTime;
 use \Exception;
+use \DateTimeZone;
+use Carbon\CarbonImmutable;
 
 class Utils
 {
+    /** @var string Timezone that should be used for all dates. */
+    const TIMEZONE = 'Europe/London';
+
     /**
-     * Get the current accademic year in string form, used in URLS.
+     * Get the current time as a Carbon\CarbonImmutable instance.
+     * @return CarbonImmutable
+     */
+    public static function now()
+    {
+        return CarbonImmutable::now(new DateTimeZone(static::TIMEZONE));
+    }
+
+    /**
+     * Get the current accademic year in string form, used in URLs.
+     * Advance to next year if current month is later or equal to July.
      * Eg '1415' for the 2014/2015 accademic year.
      * @return string
      */
     public static function yearString()
     {
-        $d = new DateTime;
-        $m = intval($d->format('m'));
-        $y = intval($d->format('y'));
-        return $m >= 7 ? $y.($y+1) : ($y-1).$y;
+        $now = static::now();
+
+        // Get start year. Assume the academic year started last year
+        // unless we're past July 1st.
+        $year = intval($now->format('y')) - 1;
+        if ($now->month >= 7)
+            $year++;
+
+        return sprintf('%s%s', $year, $year + 1);
     }
 
     /**
@@ -28,38 +47,40 @@ class Utils
      */
     public static function estimatedTerm()
     {
+        $now = static::now();
+        $year = $now->year;
+
         // Date ranges
         $termRanges = [
-            ['term' => 1, 'start' => ['month' => 9, 'date' => 1], 'end' => ['month' => 12, 'date' => 15]],
-            ['term' => 2, 'start' => ['month' => 12, 'date' => 15], 'end' => ['month' => 12, 'date' => 31]],
-            ['term' => 2, 'start' => ['month' => 1, 'date' => 1], 'end' => ['month' => 3, 'date' => 20]],
-            ['term' => 3, 'start' => ['month' => 3, 'date' => 20], 'end' => ['month' => 9, 'date' => 1]]
+            [
+                'term' => 1,
+                'start' => $now->setDate($year, 9, 1)->startOfDay(),
+                'end' => $now->setDate($year, 12, 15)->endOfDay(),
+            ],
+            [
+                'term' => 2,
+                'start' => $now->setDate($year, 12, 15)->startOfDay(),
+                'end' => $now->setDate($year, 12, 31)->endOfDay(),
+            ],
+            [
+                'term' => 2,
+                'start' => $now->setDate($year, 1, 1)->startOfDay(),
+                'end' => $now->setDate($year, 3, 20)->endOfDay(),
+            ],
+            [
+                'term' => 3,
+                'start' => $now->setDate($year, 3, 20)->startOfDay(),
+                'end' => $now->setDate($year, 9, 1)->endOfDay(),
+            ],
         ];
-
-        // Get current range
-        $termNumber = 0;
-        $year = intval((new DateTime())->format('Y'));
 
         foreach ($termRanges as $termRange){
 
-            $start = (new DateTime)
-                ->setTime(0, 0, 0)
-                ->setDate($year, $termRange['start']['month'], $termRange['start']['date']);
-
-            $end = (new DateTime)
-                ->setTime(23, 59, 59)
-                ->setDate($year, $termRange['end']['month'], $termRange['end']['date']);
-
-            if ($start < new DateTime() && $end > new DateTime()){
-                $termNumber = $termRange['term'];
-                break;
-            }
+            if ($now->between($termRange['start'], $termRange['end']))
+                return $termRange['term'];
         }
 
-        if ($termNumber == 0)
-            throw new Exception('Unable to determine current term', 1);
-
-        return $termNumber;
+        throw new Exception('Unable to determine current term');
     }
 
     /**

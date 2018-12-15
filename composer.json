@@ -5,7 +5,8 @@
         "php": ">=7.1",
         "guzzlehttp/guzzle": "~6.0",
         "slim/slim": "^3.0",
-        "ext-xml": "*"
+        "ext-xml": "*",
+        "nesbot/carbon": "^2.7"
     },
     "autoload": {
         "psr-4": {

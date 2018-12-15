@@ -99,7 +99,7 @@ class Parser
                 $response = $client->request('POST', $timetable_post_url, ['form_params' => $params]);
                 $src = $response->getBody();
             } catch (Exception $e) {
-                throw new Error('Server response error', self::ERROR_SERVER_COMMUNICATION);
+                throw new Error('Server response error', self::ERROR_SERVER_COMMUNICATION, 0, $e);
             }
 
             $sessions = $this->parseSessionDocument($src);
@@ -265,7 +265,7 @@ class Parser
                 $response = $client->request('GET', $url);
                 $src = $response->getBody();
             } catch (Exception $e) {
-                throw new Error('Server communication error', self::ERROR_SERVER_COMMUNICATION);
+                throw new Error('Server communication error', self::ERROR_SERVER_COMMUNICATION, 0, $e);
             }
 
             $data = $this->parseCourseDocument($src);

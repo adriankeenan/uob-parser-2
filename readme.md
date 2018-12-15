@@ -10,13 +10,15 @@ Built using:
 
 - [Slim](https://github.com/slimphp/Slim)
 - [Guzzle](http://docs.guzzlephp.org/en/latest/)
-- DOMDocument
-- DOMXPath
+- [Carbon](https://carbon.nesbot.com)
+- [DOMDocument](http://php.net/manual/en/class.domdocument.php)
+- [DOMXPath](http://php.net/manual/en/class.domxpath.php)
 
 Requirements:
 
 - PHP 7.1
 - Composer
+- PHP AST extension (dev only)
 
 ## Preamble
 
