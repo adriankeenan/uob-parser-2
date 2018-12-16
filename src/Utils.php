@@ -92,7 +92,7 @@ class Utils
         return new \GuzzleHttp\Client([
             'defaults' => [
                 'headers' => [
-                    'User-Agent' => 'uob-parser-2'
+                    'User-Agent' => 'uob-parser-2 (+https://github.com/adriankeenan/uob-parser-2)'
                 ]
             ]
         ]);
