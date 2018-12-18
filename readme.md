@@ -47,7 +47,7 @@ Some sessions which are available in many rooms are split in to different entrie
     $courseData = $parser->getCourses();
     ```
 
-    ```
+    ```php
     array(5) {
       ["api_version"]=>
       int(1)
@@ -111,7 +111,7 @@ Some sessions which are available in many rooms are split in to different entrie
     $sessions = $parser->getSessions($deptartment_id, $course_id, $level);
     ```
 
-    ```
+    ```php
     array(4) {
       ["api_version"]=>
       int(2)
@@ -168,7 +168,7 @@ Endpoints:
 - Courses 
     ```GET /courses```
 
-    ```
+    ```javascript
     {
         "api_version": 2,
         "response_time": 0.7,
@@ -206,7 +206,7 @@ Endpoints:
 - Sessions 
     ```GET /sessions?dept={department_id}&course={course_id}&level={level}```
 
-    ```
+    ```javascript
     {
         "api_version": 2,
         "response_time": 1.24,
@@ -254,7 +254,7 @@ Error responses will contain
 - `error_str` - Human readible error string
 - `error_id` - ID for expected exceptions (values defined [here](src/UoBParser/Parser.php))
 
-```
+```javascript
 {
     "error": true,
     "error_str": "Invalid course details",
@@ -264,9 +264,9 @@ Error responses will contain
 
 If the application is started in debug mode (`UOB_PARSER_DEBUG=1` in env), the exception details will also be included in the response:
 
-```
+```javascript
 {
-    ...
+    // ...
     "exception": {
         "class": "UoBParser\Error",
         "message": "Invalid course details",
