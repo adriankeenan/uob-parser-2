@@ -34,6 +34,8 @@ Some sessions which are available in many rooms are split in to different entrie
 
 - Run the [PHPUnit](https://github.com/sebastianbergmann/phpunit) test suite with `composer test`
 - Run static analysis using [Phan](https://github.com/phan/phan) with `composer phan`
+- Check code syntax compatibility with PHP 7.1+ using [PHPCompatibility
+](https://github.com/PHPCompatibility/PHPCompatibility) `composer php-compatibility`
 
 ## Usage
 
