@@ -32,16 +32,20 @@ Some sessions which are available in many rooms are split in to different entrie
 
 All session and course data fields provided on the official university website are included in this library, but there are some quirks with the data:
 
-- Some sessions are missing the module name - This is due to the module name column being empty in `List` view, which this data is parsed from. Strangely this does not occur in `Grid` view but this is too complex to parse. Sessions objects are returned with a boolean `is_valid` field to denote whether they are missing this information, which client applications can then use to determine whether to show a warning.
-- Some courses have an incorrect level set - Some courses have a different level in the `name` field to the actual `level` field
-```javascript
-{
-    // ...
-    "name": "EFL Intermediate - UG Credit - Ltn - Year 1 Oct SFT",
-    "level": "Undergraduate Year 4",
-}
-```
-The university website allows filtering courses by the level field, therefore it is affected by his inconsistency.
+- __Some sessions are missing the module name__
+    
+    This is due to the module name column being empty in `List` view, which this data is parsed from. Strangely this does not occur in `Grid` view but this is too complex to parse. Sessions objects are returned with a boolean `is_valid` field to denote whether they are missing this information, which client applications can then use to determine whether to show a warning.
+- __Some courses have an incorrect level set__
+    
+    Some courses have a different level in the `name` field to the actual `level` field
+    ```javascript
+    {
+        // ...
+        "name": "EFL Intermediate - UG Credit - Ltn - Year 1 Oct SFT",
+        "level": "Undergraduate Year 4",
+    }
+    ```
+    The university website allows filtering courses by the level field, therefore it is affected by his inconsistency.
 
 
 ## Testing
