@@ -122,7 +122,6 @@ class Session
             'end' => $this->end,
         ];
 
-        // Potential for collissions - consider serialising as JSON before hashing
         return md5(json_encode($values));
     }
 
