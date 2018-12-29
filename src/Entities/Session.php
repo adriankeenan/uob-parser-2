@@ -115,15 +115,14 @@ class Session
     public function hash()
     {
         $values = [
-            $this->moduleName,
-            $this->type,
-            $this->day,
-            $this->start,
-            $this->end,
+            'module' => $this->moduleName,
+            'type' => $this->type,
+            'day' => $this->day,
+            'start' => $this->start,
+            'end' => $this->end,
         ];
 
-        // Potential for collissions - consider serialising as JSON before hashing
-        return md5(implode('', $values));
+        return md5(json_encode($values));
     }
 
     /**

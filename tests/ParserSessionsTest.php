@@ -45,7 +45,7 @@ final class ParserSessionsTest extends TestCase
                     'C016',
                     'C015'
                 ],
-                'hash' => '2b0801d69d67b7bbc4dbe71d881d228d',
+                'hash' => '754be31034bb54be6d936af158e6bfa2',
                 'is_valid' => true,
             ],
             // This session is invalid
@@ -70,7 +70,7 @@ final class ParserSessionsTest extends TestCase
                     'MK010',
                     'MK027',
                 ],
-                'hash' => 'a3433d3e092a859744f9fd497b4aa183',
+                'hash' => 'ae6f58fb88d75ab1ce9e95f42f8cdd6d',
                 'is_valid' => false,
             ],
         ];
