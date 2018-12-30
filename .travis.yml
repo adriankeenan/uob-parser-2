@@ -3,7 +3,6 @@ php:
   - '7.3'
   - '7.2'
   - '7.1'
-  - nightly
 before_script:
   - pecl install ast-0.1.5
   - composer self-update
