@@ -81,6 +81,10 @@ All session and course data fields provided on the official university website a
           string(17) "BSCCS-S/02AA/1/FT"
           ["name"]=>
           string(51) "Computer Science - BSc (Hons) - Ltn - Year 1 Feb FT"
+          ["name_start"]=>
+          string(16) "Computer Science"
+          ["name_end"]=>
+          string(32) "BSc (Hons) - Ltn - Year 1 Feb FT"
           ["level"]=>
           string(20) "Undergraduate Year 1"
           ["department"]=>
@@ -93,11 +97,7 @@ All session and course data fields provided on the official university website a
             int(581)
           }
           ["session_url"]=>
-          string(100) "http://whatever/sessions?dept=CM010&course=BSCCS-S%2F02AA%2F1%2FFT&level=Undergraduate+Year+1"
-          ["name_start"]=>
-          string(16) "Computer Science"
-          ["name_end"]=>
-          string(32) "BSc (Hons) - Ltn - Year 1 Feb FT"
+          string(97) "https://example.com/sessions?dept=CM010&course=BSCCS-S%2F02AA%2F1%2FFT&level=Undergraduate+Year+1"
         }
       }
       ["departments"]=>
@@ -195,15 +195,15 @@ Endpoints:
             {
                 "id": "BSCCS-S/02AA/1/CIS213/BSc (Hons)/FT",
                 "name": "Computer Science - BSc (Hons) - Ltn - Year 1 Feb FT",
+                "name_start": "Computer Science",
+                "name_end": "BSc (Hons) - Ltn - Year 1 Fe - Ltn - Year 1 Feb FT",
                 "level": "Undergraduate Year 1",
                 "department": {
                     "id": "12600",
                     "name": "Department of Computer Science and Technology",
                     "course_count": 581
                 },
-                "session_url": "http://whatever/sessions?dept=12600&course=BSCCS-S%2F02AA%2F1%2FCIS213%2FBSc+%28Hons%29%2FFT&level=Undergraduate+Year+1",
-                "name_start": "Computer Science",
-                "name_end": "BSc (Hons) - Ltn - Year 1 Fe - Ltn - Year 1 Feb FT"
+                "session_url": "https://example.com/sessions?dept=12600&course=BSCCS-S%2F02AA%2F1%2FCIS213%2FBSc+%28Hons%29%2FFT&level=Undergraduate+Year+1"
             }
         ],
         "departments": [

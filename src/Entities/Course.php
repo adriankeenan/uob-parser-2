@@ -88,14 +88,16 @@ class Course
      */
     public function toArray()
     {
-        $data = [
+        $names = $this->names();
+
+        return [
             'id'            => $this->id,
             'name'          => $this->name,
+            'name_start'    => $names['name_start'],
+            'name_end'      => $names['name_end'],
             'level'         => $this->level,
             'department'    => $this->department instanceof Department ? $this->department->toArray() : null,
         ];
-
-        return array_merge($data, $this->names());
     }
 
 }
