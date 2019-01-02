@@ -17,7 +17,7 @@ class Session
      * @param integer $day Day of week as an integer (0 to 4, Monday to Friday)
      * @param string $start Start time in HH:MM format
      * @param string $end  End time in HH:MM format
-     * @param array $rooms List of rooms
+     * @param array<string> $rooms List of rooms
      */
     function __construct($moduleName, $type, $day, $start, $end, $rooms)
     {
@@ -77,7 +77,7 @@ class Session
      * Examples include
      *      C003 - CST Teaching Lab => C003 //Luton
      *      P0.102 - Lab C - General Teaching Lab => P0.102 //Bedford
-     * @return array
+     * @return array<string>
      */
     public function roomsShort()
     {

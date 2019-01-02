@@ -402,7 +402,12 @@ class Parser
         ];
     }
 
-    private function objectsToArrays(array $objects): array
+    /**
+     * Convert a list of objects to arrays by calling their `toArray` method.
+     * @param array<object> $objects
+     * @return array<array>
+     */
+    private function objectsToArrays($objects)
     {
         return array_map(function($object){ return $object->toArray(); }, $objects);
     }

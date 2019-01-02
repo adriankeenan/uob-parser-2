@@ -32,7 +32,7 @@ class Course
     /**
      * Split name in to chunks
      * Parse the string so that it isn't split by '-' between brackets
-     * @return array
+     * @return array<string>
      */
     public function nameChunks()
     {
@@ -70,7 +70,7 @@ class Course
      * Return an array containing:
      *  - name_start - name of the course
      *  - name_end - all other data (year etc)
-     * @return array
+     * @return array<string, string>
      */
     public function names()
     {
