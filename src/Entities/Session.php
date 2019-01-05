@@ -81,13 +81,28 @@ class Session
      */
     public function roomsShort()
     {
-        return array_map(function($r){
+        // Shorten each room if it looks like the first segment
+        // is a room number
+        $rooms_short = array_map(function($r){
             $pattern = '/^([A-Z0-9.]+)\s-/';
             $matches = [];
             if (preg_match($pattern, $r, $matches))
                 return $matches[1];
             return $r;
         }, $this->rooms);
+
+        // If we end up with duplicated short room strings, this is
+        // likely because some of the room strings have a different
+        // second part (eg "A100 - A", "A100 - B"). In this case, it's
+        // best to return the original values for all rooms so that
+        // we're not missing anything. This situation does seem very
+        // rare.
+        $unique_rooms_long = count(array_unique($this->rooms));
+        $unique_rooms_short = count(array_unique($rooms_short));
+        if ($unique_rooms_short < $unique_rooms_long)
+            return $this->rooms;
+
+        return $rooms_short;
     }
 
     /**

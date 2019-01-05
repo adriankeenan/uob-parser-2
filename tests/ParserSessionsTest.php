@@ -48,6 +48,29 @@ final class ParserSessionsTest extends TestCase
                 'hash' => '754be31034bb54be6d936af158e6bfa2',
                 'is_valid' => true,
             ],
+            // This session has duplicate short rooms
+            [
+                'module_name' => 'Concepts And Technologies Of Artificial Intelligence',
+                'day' => 1,
+                'day_name' => 'Tuesday',
+                'start' => '9:00',
+                'end' => '11:00',
+                'length' => 2,
+                'length_str' => '2 hours',
+                'type' => 'Practical',
+                'rooms' => [
+                    'A100 - A',
+                    'A100 - B',
+                    'A310 - CST Teaching Lab'
+                ],
+                'rooms_short' => [
+                    'A100 - A',
+                    'A100 - B',
+                    'A310 - CST Teaching Lab'
+                ],
+                'hash' => '0fc8f8027186bc3ddef2a061d0eefd0b',
+                'is_valid' => true,
+            ],
             // This session is invalid
             [
                 'module_name' => '',
