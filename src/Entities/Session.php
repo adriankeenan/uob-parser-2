@@ -75,16 +75,20 @@ class Session
     /**
      * Get a list of rooms containing only the same room ID.
      * Examples include
-     *      C003 - CST Teaching Lab => C003 //Luton
-     *      P0.102 - Lab C - General Teaching Lab => P0.102 //Bedford
+     *      'C003 - CST Teaching Lab' => 'C003' // Luton
+     *      'P0.102 - Lab C - General Teaching Lab' => 'P0.102' // Bedford
+     *      'MK010 - Electronics and Telecoms Lab' => 'MK010' // Milton Keynes
+     * See Session unit tests for more examples
      * @return array<string>
      */
     public function roomsShort()
     {
         // Shorten each room if it looks like the first segment
-        // is a room number
+        // is a room number. These are generally composed of uppercase
+        // letters, numbers and fullstops, possibly followed by a
+        // single lowercase letter.
         $rooms_short = array_map(function($r){
-            $pattern = '/^([A-Z0-9.]+)\s-/';
+            $pattern = '/^([A-Z0-9.]+[a-z]{0,1})\s-/';
             $matches = [];
             if (preg_match($pattern, $r, $matches))
                 return $matches[1];
