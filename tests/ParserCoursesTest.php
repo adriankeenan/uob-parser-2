@@ -43,7 +43,7 @@ final class ParserCoursesTest extends TestCase
             'id' => 'BSSESABF/10AB/3/FT',
             'name' => 'Sport and Physical Education (BSc - With Professional Practice Year) - BSc (Hons) - Bed - Year 3 Oct FT',
             'level' => 'Undergraduate Year 3',
-            'department' =>             [
+            'department' => [
                 'id' => 'BD032',
                 'name' => 'School of Sport Science and Physical Activity',
                 'course_count' => 1,

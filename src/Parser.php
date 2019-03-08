@@ -65,8 +65,8 @@ class Parser
 
         try {
             // Build POST URL string
-            $timetable_url = 'https://timetable.beds.ac.uk/sws'.Utils::yearString();
-            $timetable_post_url = $timetable_url.'/showtimetable.asp';
+            $timetableUrl = 'https://timetable.beds.ac.uk/sws'.Utils::yearString();
+            $timetablePostUrl = $timetableUrl.'/showtimetable.asp';
 
             // Get the current term (estimated)
             $termWeekRanges = [
@@ -96,7 +96,7 @@ class Parser
             try
             {
                 $client = Utils::makeGuzzle();
-                $response = $client->request('POST', $timetable_post_url, ['form_params' => $params]);
+                $response = $client->request('POST', $timetablePostUrl, ['form_params' => $params]);
                 $src = $response->getBody();
             } catch (Exception $e) {
                 throw new Error('Server response error', self::ERROR_SERVER_COMMUNICATION, 0, $e);
@@ -105,10 +105,10 @@ class Parser
             $sessions = $this->parseSessionDocument($src);
 
             return $this->makeResponse([
-                'timetable_url' => $timetable_url,
-                'sessions' => array_map(function($s){
+                'timetable_url' => $timetableUrl,
+                'sessions' => array_map(function(Entities\Session $session){
 
-                    $arr = $s->toArray();
+                    $arr = $session->toArray();
 
                     // Add fields expected by clients running V1
                     if ($this->version == 1) {
