@@ -10,7 +10,7 @@ final class ParserSessionsTest extends TestCase
         $this->parser = new UoBParser\Parser;
 
         // Load test data
-        $this->test_parse_data = file_get_contents(__DIR__.'/data/showtimetable.html');
+        $this->testParseData = file_get_contents(__DIR__.'/data/showtimetable.html');
     }
 
     public function testInvalidInput(): void
@@ -23,8 +23,8 @@ final class ParserSessionsTest extends TestCase
 
     public function testSessions(): void
     {
-        $parse_result = $this->parser->parseSessionDocument($this->test_parse_data);
-        $sessions = $this->objectsToArrays($parse_result);
+        $parseResult = $this->parser->parseSessionDocument($this->testParseData);
+        $sessions = UoBParser\Utils::objectsToArrays($parseResult);
 
         $expected = [
             // This session is merged from two sessions, due to overlapping attributes
@@ -126,24 +126,19 @@ final class ParserSessionsTest extends TestCase
             'MK007'                                                 => 'MK007',
         ];
 
-        $rooms_long = array_keys($rooms);
-        $rooms_short = array_values($rooms);
+        $roomsLong = array_keys($rooms);
+        $roomsShort = array_values($rooms);
 
         // Create test sesssion with set rooms and check that long room names are converted to
         // short room names correctly
-        $session = new UoBParser\Entities\Session('Test module', 'Lecture', 0, '9:00', '11:00', $rooms_long);
-        $this->assertEquals($rooms_long, $session->rooms);
-        $this->assertEquals($rooms_short, $session->roomsShort());
+        $session = new UoBParser\Entities\Session('Test module', 'Lecture', 0, '9:00', '11:00', $roomsLong);
+        $this->assertEquals($roomsLong, $session->rooms);
+        $this->assertEquals($roomsShort, $session->roomsShort());
 
         // Perform the same test with already shortened room names to make sure they are handled
         // corrected (eg not changed).
-        $session = new UoBParser\Entities\Session('Test module', 'Lecture', 0, '9:00', '11:00', $rooms_short);
-        $this->assertEquals($rooms_short, $session->rooms);
-        $this->assertEquals($rooms_short, $session->roomsShort());
-    }
-
-    private function objectsToArrays(array $objects): array
-    {
-        return array_map(function($object){ return $object->toArray(); }, $objects);
+        $session = new UoBParser\Entities\Session('Test module', 'Lecture', 0, '9:00', '11:00', $roomsShort);
+        $this->assertEquals($roomsShort, $session->rooms);
+        $this->assertEquals($roomsShort, $session->roomsShort());
     }
 }

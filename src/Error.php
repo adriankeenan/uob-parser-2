@@ -6,6 +6,9 @@ use \Exception;
 
 class Error extends Exception {
 
+    /**
+     * @var string|null Exception ID
+     */
     protected $id;
 
     /**
@@ -14,7 +17,7 @@ class Error extends Exception {
      * @param integer $code The Exception code
      * @param Exception|null $previous The previous exception used for the exception chaining
      */
-    public function __construct($message = null, $id = null, $code = 0, Exception $previous = null)
+    public function __construct($message = null, $id = null, $code = 0, $previous = null)
     {
         parent::__construct($message, $code, $previous);
         $this->id = $id;

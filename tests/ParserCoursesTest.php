@@ -10,7 +10,7 @@ final class ParserCoursesTest extends TestCase
         $this->parser = new UoBParser\Parser;
 
         // Load test data
-        $this->test_parse_data = file_get_contents(__DIR__.'/data/data_autogen.js');
+        $this->testParseData = file_get_contents(__DIR__.'/data/data_autogen.js');
     }
 
     public function testInvalidInput(): void
@@ -23,9 +23,9 @@ final class ParserCoursesTest extends TestCase
 
     public function testCourses(): void
     {
-        $parse_result = $this->parser->parseCourseDocument($this->test_parse_data);
+        $parseResult = $this->parser->parseCourseDocument($this->testParseData)->toArray();
 
-        $course_0 = [
+        $course0 = [
             'id' => 'BSCCS-S/10AA/1/FT',
             'name' => 'Computer Science - BSc (Hons) - Ltn - Year 1 Oct FT',
             'level' => 'Undergraduate Year 1',
@@ -37,9 +37,9 @@ final class ParserCoursesTest extends TestCase
             'name_start' => 'Computer Science',
             'name_end' => 'BSc (Hons) - Ltn - Year 1 Oct FT',
         ];
-        $this->assertEquals($course_0, $parse_result['courses'][0]->toArray());
+        $this->assertEquals($course0, $parseResult['courses'][0]);
 
-        $course_3 = [
+        $course3 = [
             'id' => 'BSSESABF/10AB/3/FT',
             'name' => 'Sport and Physical Education (BSc - With Professional Practice Year) - BSc (Hons) - Bed - Year 3 Oct FT',
             'level' => 'Undergraduate Year 3',
@@ -51,13 +51,12 @@ final class ParserCoursesTest extends TestCase
             'name_start' => 'Sport and Physical Education (BSc - With Professional Practice Year)',
             'name_end' => 'BSc (Hons) - Bed - Year 3 Oct FT',
         ];
-        $this->assertEquals($course_3, $parse_result['courses'][3]->toArray());
+        $this->assertEquals($course3, $parseResult['courses'][3]);
     }
 
     public function testDepartments(): void
     {
-        $parse_result = $this->parser->parseCourseDocument($this->test_parse_data);
-        $departments = $this->objectsToArrays($parse_result['departments']);
+        $departments = $this->parser->parseCourseDocument($this->testParseData)->toArray()['departments'];
 
         $expected = [
             [
@@ -77,8 +76,7 @@ final class ParserCoursesTest extends TestCase
 
     public function testLevels(): void
     {
-        $parse_result = $this->parser->parseCourseDocument($this->test_parse_data);
-        $levels = $this->objectsToArrays($parse_result['levels']);
+        $levels = $this->parser->parseCourseDocument($this->testParseData)->toArray()['levels'];
 
         $expected = [
             ['name' => 'Apprenticeship'],
@@ -92,10 +90,5 @@ final class ParserCoursesTest extends TestCase
         ];
 
         $this->assertEquals($expected, $levels);
-    }
-
-    private function objectsToArrays(array $objects): array
-    {
-        return array_map(function($object){ return $object->toArray(); }, $objects);
     }
 }

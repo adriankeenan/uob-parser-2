@@ -2,10 +2,23 @@
 
 namespace UoBParser\Entities;
 
-class Department
+use \UoBParser\Arrayable;
+
+class Department implements Arrayable
 {
+    /**
+     * @var string Department ID
+     */
     public $id;
+
+    /**
+     * @var string Department name
+     */
     public $name;
+
+    /**
+     * @var int Number of courses in the department
+     */
     public $courseCount;
 
     /**

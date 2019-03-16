@@ -28,6 +28,27 @@ function exceptionToArray($exception){
     ];
 }
 
+/**
+ * Build an array containing base response information and main response
+ * data for the endpoint.
+ * @param int $api_version Requested API version
+ * @param Callable $callback Callback which rerturns the main response data
+ * @return array
+ */
+function makeResponse($api_version, $callback){
+
+    $startTime = microtime(true);
+    $result = $callback();
+    $timeTaken = microtime(true) - $startTime;
+
+    $baseData = [
+        'api_version' => $api_version,
+        'response_time' => floatval(sprintf('%.2f', $timeTaken)),
+        'error' => false,
+    ];
+    return array_merge($baseData, $result);
+}
+
 // Get debug
 $debug = getenv('UOB_PARSER_DEBUG') === '1';
 
@@ -81,6 +102,7 @@ $container['errorHandler'] = function($container) {
 };
 
 $container['config'] = ['debug' => $debug];
+$container['settings']['displayErrorDetails'] = $debug;
 
 $app = new \Slim\App($container);
 
@@ -117,24 +139,61 @@ $app->get('/courses', function(Request $request, Response $response) {
 
     $version = $request->getAttribute('apiVersion');
 
-    $parser = new UoBParser\Parser($version);
-    $courses = $parser->getCourses();
+    $isHttps = empty($_SERVER['HTTPS']) == false && $_SERVER['HTTPS'] != 'off';
 
-    return $response->withJson($courses, 200, JSON_PRETTY_PRINT);
+    $baseUrl = $isHttps ? 'https://' : 'http://';
+    $baseUrl .= $_SERVER['SERVER_NAME'];
+    $baseUrl .= in_array($_SERVER['SERVER_PORT'], [80, 443]) == false ? ':'.$_SERVER['SERVER_PORT'] : '';
+    $baseUrl .= rtrim(dirname($_SERVER['PHP_SELF']), '/');
+    $baseUrl .= '/sessions';
+
+    $data = makeResponse($version, function() use ($baseUrl) {
+        $parser = new UoBParser\Parser();
+        $data = $parser->getCourses()->toArray();
+
+        // Add session URL to coursess
+        $data['courses'] = array_map(function($course) use ($baseUrl) {
+            $args = [
+                'dept' => $course['department']['id'],
+                'course' => $course['id'],
+                'level' => $course['level'],
+            ];
+            $course['session_url'] = $baseUrl.'?'.http_build_query($args);
+
+            return $course;
+        }, $data['courses']);
+
+        return $data;
+    });
+
+    return $response->withJson($data, 200, JSON_PRETTY_PRINT);
 });
 
 $app->get('/sessions', function(Request $request, Response $response) {
+
+    $version = $request->getAttribute('apiVersion');
 
     $dept   = $request->getParam('dept');
     $course = $request->getParam('course');
     $level  = $request->getParam('level');
 
-    $version = $request->getAttribute('apiVersion');
+    $data = makeResponse($version, function() use ($version, $dept, $course, $level) {
+        $parser = new UoBParser\Parser();
+        $data = $parser->getSessions($dept, $course, $level)->toArray();
 
-    $parser = new UoBParser\Parser($version);
-    $sessions = $parser->getSessions($dept, $course, $level);
+        // Add fields expected by clients using V1
+        if ($version == 1) {
+            $data['sessions'] = array_map(function($session){
+                $session['module_code'] = '';
+                $session['staff'] = [];
+                return $session;
+            }, $data['sessions']);
+        }
 
-    return $response->withJson($sessions, 200, JSON_PRETTY_PRINT);
+        return $data;
+    });
+
+    return $response->withJson($data, 200, JSON_PRETTY_PRINT);
 });
 
 $app->run();

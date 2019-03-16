@@ -2,8 +2,13 @@
 
 namespace UoBParser\Entities;
 
-class Level
+use \UoBParser\Arrayable;
+
+class Level implements Arrayable
 {
+    /**
+     * @var string Level name
+     */
     public $name;
 
     /**

@@ -47,4 +47,32 @@ final class UtilityTest extends TestCase
         CarbonImmutable::setTestNow(CarbonImmutable::create(null, 5, 1, 0, 0, 0, $tz));
         $this->assertSame(3, UoBParser\Utils::estimatedTerm());
     }
+
+    public function testObjectsToArrays()
+    {
+        $arrayables = [];
+        for ($i = 0; $i < 3; $i++){
+            $arrayables[] = new class($i + 1) implements \UoBParser\Arrayable {
+                protected $id;
+
+                public function __construct(int $id)
+                {
+                    $this->id = $id;
+                }
+
+                public function toArray(): array
+                {
+                    return ['id' => $this->id];
+                }
+            };
+        }
+
+        $expected = [
+            ['id' => 1],
+            ['id' => 2],
+            ['id' => 3],
+        ];
+
+        $this->assertSame($expected, \UoBParser\Utils::objectsToArrays($arrayables));
+    }
 }

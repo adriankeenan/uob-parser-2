@@ -2,13 +2,38 @@
 
 namespace UoBParser\Entities;
 
-class Session
+use \UoBParser\Arrayable;
+
+class Session implements Arrayable
 {
+    /**
+     * @var string Module name
+     */
     public $moduleName;
+
+    /**
+     * @var string Session tyle (eg Lecture, Practical etc)
+     */
     public $type;
+
+    /**
+     * @var integer Day of week as an integer (0 to 4, Monday to Friday)
+     */
     public $day;
+
+    /**
+     * @var string Start time in HH:MM format
+     */
     public $start;
+
+    /**
+     * @var string End time in HH:MM format
+     */
     public $end;
+
+    /**
+     * @var array<string> List of rooms
+     */
     public $rooms;
 
     /**
@@ -16,7 +41,7 @@ class Session
      * @param string $type Session tyle (eg Lecture, Practical etc)
      * @param integer $day Day of week as an integer (0 to 4, Monday to Friday)
      * @param string $start Start time in HH:MM format
-     * @param string $end  End time in HH:MM format
+     * @param string $end End time in HH:MM format
      * @param array<string> $rooms List of rooms
      */
     function __construct($moduleName, $type, $day, $start, $end, $rooms)

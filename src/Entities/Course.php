@@ -2,15 +2,32 @@
 
 namespace UoBParser\Entities;
 
-class Course
+use \UoBParser\Arrayable;
+
+class Course implements Arrayable
 {
+    /**
+     * @var string Course ID
+     */
     public $id;
+
+    /**
+     * @var string Course name
+     */
     public $name;
+
+    /**
+     * @var string Course level
+     */
     public $level;
+
+    /**
+     * @var string Course department ID
+     */
     public $departmentId;
 
     /**
-     * @var Department|null
+     * @var Department|null Course department
      */
     public $department;
 

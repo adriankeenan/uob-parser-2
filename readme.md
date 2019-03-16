@@ -2,7 +2,8 @@
 
 [![Build Status](https://travis-ci.com/adriankeenan/uob-parser-2.svg?branch=master)](https://travis-ci.com/adriankeenan/uob-parser-2)
 
-A JSON API for the University of Bedfordshire timetable system.
+A parser for the University of Bedfordshire timetable system which includes a JSON REST
+API for accessing the data.
 
 Try it out here: https://uob-timetable-api.adriankeenan.co.uk
 
@@ -16,7 +17,7 @@ Built using:
 
 Requirements:
 
-- PHP 7.1
+- PHP >= 7.1
 - Composer
 - PHP AST extension (dev only)
 
@@ -45,14 +46,15 @@ All session and course data fields provided on the official university website a
         "level": "Undergraduate Year 4",
     }
     ```
-    The university website allows filtering courses by the level field, therefore it is affected by his inconsistency.
+
+    The university website allows filtering courses by the `level` field, therefore it is affected by his inconsistency.
 
 
 ## Testing
 
 - Run the [PHPUnit](https://github.com/sebastianbergmann/phpunit) test suite with `composer test`
 - Run static analysis using [Phan](https://github.com/phan/phan) with `composer phan`
-- Check code syntax compatibility with PHP 7.1+ using [PHPCompatibility
+- Check code syntax compatibility with PHP >= 7.1 using [PHPCompatibility
 ](https://github.com/PHPCompatibility/PHPCompatibility) `composer php-compatibility`
 
 ## Usage
@@ -66,56 +68,46 @@ All session and course data fields provided on the official university website a
     ```
 
     ```php
-    array(5) {
-      ["api_version"]=>
-      int(1)
-      ["response_time"]=>
-      float(0.8)
-      ["error"]=>
-      bool(false)
+    object(UoBParser\Responses\CoursesResponse)#3615 (3) {
       ["courses"]=>
-      array(3650) {
-        [995]=>
-        array(7) {
+      array(3520) {
+        [3126]=>
+        object(UoBParser\Entities\Course)#1679 (5) {
           ["id"]=>
-          string(17) "BSCCS-S/02AA/1/FT"
+          string(17) "BSCES-S/10AA/1/FT"
           ["name"]=>
-          string(51) "Computer Science - BSc (Hons) - Ltn - Year 1 Feb FT"
-          ["name_start"]=>
-          string(16) "Computer Science"
-          ["name_end"]=>
-          string(32) "BSc (Hons) - Ltn - Year 1 Feb FT"
+          string(55) "Computer Science - BSc (Hons) - Ltn - Year 1 Feb FT"
           ["level"]=>
           string(20) "Undergraduate Year 1"
+          ["departmentId"]=>
+          string(5) "CM010"
           ["department"]=>
-          array(3) {
+          object(UoBParser\Entities\Department)#77 (3) {
             ["id"]=>
             string(5) "CM010"
             ["name"]=>
             string(41) "School of Computer Science and Technology"
-            ["course_count"]=>
+            ["courseCount"]=>
             int(581)
           }
-          ["session_url"]=>
-          string(97) "https://example.com/sessions?dept=CM010&course=BSCCS-S%2F02AA%2F1%2FFT&level=Undergraduate+Year+1"
         }
       }
       ["departments"]=>
-      array(16) {
+      array(17) {
         [6]=>
-        array(3) {
+        object(UoBParser\Entities\Department)#77 (3) {
           ["id"]=>
           string(5) "CM010"
           ["name"]=>
           string(41) "School of Computer Science and Technology"
-          ["course_count"]=>
-          int(581)
+          ["courseCount"]=>
+          int(568)
         }
       }
       ["levels"]=>
       array(8) {
         [4]=>
-        array(1) {
+        object(UoBParser\Entities\Level)#3609 (1) {
           ["name"]=>
           string(20) "Undergraduate Year 1"
         }
@@ -126,57 +118,40 @@ All session and course data fields provided on the official university website a
 - Sessions
     ```php
     $parser = new UoBParser\Parser();
-    $sessions = $parser->getSessions($deptartment_id, $course_id, $level);
+    $sessions = $parser->getSessions($deptartmentId, $courseId, $level);
     ```
 
     ```php
-    array(4) {
-      ["api_version"]=>
-      int(2)
-      ["response_time"]=>
-      float(1.17)
-      ["error"]=>
-      bool(false)
-      ["timetable_url"]=>
+    object(UoBParser\Responses\SessionsResponse)#106 (2) {
+      ["timetableUrl"]=>
       string(36) "https://timetable.beds.ac.uk/sws1819"
       ["sessions"]=>
       array(21) {
         [0]=>
-        array(11) {
-          ["module_name"]=>
-          string(32) "Fundamentals Of Computer Studies"
-          ["day"]=>
-          int(0)
-          ["day_name"]=>
-          string(6) "Monday"
-          ["start"]=>
-          string(4) "9:00"
-          ["end"]=>
-          string(5) "11:00"
-          ["length"]=>
-          int(2)
-          ["length_str"]=>
-          string(7) "2 hours"
+        object(UoBParser\Entities\Session)#85 (6) {
+          ["moduleName"]=>
+          string(25) "Fundamentals Of Computer Studies"
           ["type"]=>
           string(7) "Lecture"
+          ["day"]=>
+          int(0)
+          ["start"]=>
+          string(5) "9:00"
+          ["end"]=>
+          string(5) "11:00"
           ["rooms"]=>
           array(1) {
             [0]=>
             string(36) "C016 - CST Teaching Lab"
           }
-          ["rooms_short"]=>
-          array(1) {
-            [0]=>
-            string(4) "C016"
-          }
-          ["hash"]=>
-          string(32) "be39ce93b2a78f3b73b4e8cbe84559dc"
-          ["is_valid"]=>
-          bool(true)
         }
       }
     }
     ```
+
+#### Errors
+
+Exceptions will be thrown either as `\Exception` or `[\UoBParser\Error](src/UoBParser/Error.php)`, which includes an additional `getID()` method. The list of potention error IDs can be found [here](src/UoBParser/Parser.php).
 
 ### Webservice
 
@@ -296,3 +271,7 @@ If the application is started in debug mode (`UOB_PARSER_DEBUG=1` in env), the e
     }
 }
 ```
+
+## License
+
+[MIT](LICENSE)

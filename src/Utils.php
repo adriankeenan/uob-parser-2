@@ -4,11 +4,14 @@ namespace UoBParser;
 
 use \Exception;
 use \DateTimeZone;
-use Carbon\CarbonImmutable;
+use \Carbon\CarbonImmutable;
+use \UoBParser\Arrayable;
 
 class Utils
 {
-    /** @var string Timezone that should be used for all dates. */
+    /**
+     * @var string Timezone that should be used for all dates.
+     */
     const TIMEZONE = 'Europe/London';
 
     /**
@@ -96,5 +99,17 @@ class Utils
                 ]
             ]
         ]);
+    }
+
+    /**
+     * Convert a list of objects to arrays by calling their `toArray()` method.
+     * @param array<Arrayable> $objects
+     * @return array<array>
+     */
+    public static function objectsToArrays($objects)
+    {
+        return array_map(function($object){
+            return $object->toArray();
+        }, $objects);
     }
 }

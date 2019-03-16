@@ -13,41 +13,9 @@ class Parser
     const ERROR_SERVER_RESPONSE = 'server_response_invalid';
     const ERROR_COURSE_INVALID = 'course_invalid';
 
-    private $version;
-    private $startTime;
-
-    public function __construct($version=1)
+    public function __construct()
     {
-        $this->version = $version;
-
         libxml_use_internal_errors(true);
-    }
-
-    /**
-     * Start a timer used for measuring the response time
-     * @return null
-     */
-    private function startTimer()
-    {
-        $this->startTime = microtime(true);
-    }
-
-    /**
-     * Generate an array based on either valid output data or an exception
-     * @param array $data
-     * @return array
-     */
-    public function makeResponse($data)
-    {
-        $timeTaken = microtime(true) - $this->startTime;
-
-        $outputData = [
-            'api_version' => $this->version,
-            'response_time' => floatval(sprintf('%.2f', $timeTaken)),
-            'error' => false,
-        ];
-
-        return array_merge($outputData, $data);
     }
 
     /**
@@ -57,12 +25,10 @@ class Parser
      * @param string $course Department for course
      * @param string $level Level for course
      * @throws Error
-     * @return array
+     * @return Responses\SessionsResponse
      */
     public function getSessions($dept, $course, $level)
     {
-        $this->startTimer();
-
         try {
             // Build POST URL string
             $timetableUrl = 'https://timetable.beds.ac.uk/sws'.Utils::yearString();
@@ -104,22 +70,7 @@ class Parser
 
             $sessions = $this->parseSessionDocument($src);
 
-            return $this->makeResponse([
-                'timetable_url' => $timetableUrl,
-                'sessions' => array_map(function(Entities\Session $session){
-
-                    $arr = $session->toArray();
-
-                    // Add fields expected by clients running V1
-                    if ($this->version == 1) {
-                        $arr['module_code'] = '';
-                        $arr['staff'] = [];
-                    }
-
-                    return $arr;
-
-                }, $sessions),
-            ]);
+            return new Responses\SessionsResponse($timetableUrl, $sessions);
         } catch (Error $e) {
             throw $e;
         } catch (Exception $e) {
@@ -249,12 +200,10 @@ class Parser
      * Download the metadata javascript file and return a response array
      * containing the courses and departments
      * @throws Error
-     * @return array
+     * @return Responses\CoursesResponse
      */
     public function getCourses()
     {
-        $this->startTimer();
-
         try {
             // Build generated JavaScript URL
             $url = 'https://timetable.beds.ac.uk/sws'.Utils::yearString().'/js/data_autogen.js';
@@ -268,35 +217,7 @@ class Parser
                 throw new Error('Server communication error', self::ERROR_SERVER_COMMUNICATION, 0, $e);
             }
 
-            $data = $this->parseCourseDocument($src);
-
-            return $this->makeResponse([
-                'courses' =>  array_map(function($course){ 
-                    $course = $course->toArray();
-                    
-                    if (isset($_SERVER['SERVER_NAME'])) {
-                        $args = [
-                            'dept' => $course['department']['id'],
-                            'course' => $course['id'],
-                            'level' => $course['level'],
-                        ];
-
-                        $isHttps = empty($_SERVER['HTTPS']) == false && $_SERVER['HTTPS'] != 'off';
-
-                        $url = $isHttps ? 'https://' : 'http://';
-                        $url .= $_SERVER['SERVER_NAME'];
-                        $url .= in_array($_SERVER['SERVER_PORT'], [80, 443]) == false ? ':'.$_SERVER['SERVER_PORT'] : '';
-                        $url .= rtrim(dirname($_SERVER['PHP_SELF']), '/');
-                        $url .= '/sessions?'.http_build_query($args);
-
-                        $course['session_url'] = $url;
-                    }
-
-                    return $course;
-                }, $data['courses']),
-                'departments' =>  $this->objectsToArrays($data['departments']),
-                'levels' => $this->objectsToArrays($data['levels']),
-            ]);
+            return $this->parseCourseDocument($src);
         } catch (Error $e) {
             throw $e;
         } catch (Exception $e) {
@@ -308,7 +229,7 @@ class Parser
      * Get a list of course and session objects from the source javascript
      * metadata
      * @param string $src Source javascript file
-     * @return array
+     * @return Responses\CoursesResponse
      */
     public function parseCourseDocument($src)
     {
@@ -395,20 +316,6 @@ class Parser
         usort($courses, $sortalpha);
         usort($levels, $sortalpha);
 
-        return [
-            'courses'       =>  $courses,
-            'departments'   =>  $depts,
-            'levels'        =>  $levels,
-        ];
-    }
-
-    /**
-     * Convert a list of objects to arrays by calling their `toArray` method.
-     * @param array<object> $objects
-     * @return array<array>
-     */
-    private function objectsToArrays($objects)
-    {
-        return array_map(function($object){ return $object->toArray(); }, $objects);
+        return new Responses\CoursesResponse($courses, $depts, $levels);
     }
 }
