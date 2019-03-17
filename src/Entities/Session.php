@@ -3,8 +3,9 @@
 namespace UoBParser\Entities;
 
 use \UoBParser\Arrayable;
+use \UoBParser\Equatable;
 
-class Session implements Arrayable
+class Session implements Arrayable, Equatable
 {
     /**
      * @var string Module name
@@ -166,6 +167,8 @@ class Session implements Arrayable
             'end' => $this->end,
         ];
 
+        // We need to be careful that the types and whitespace do not change, otherwise
+        // this could cause a different hash for the same input data.
         return md5(json_encode($values));
     }
 
@@ -193,30 +196,32 @@ class Session implements Arrayable
 
     /**
      * Determine whether two sessions are considered equal.
-     * @param object $other
+     * @param Session $other
      * @return bool
      */
     public function equals($other)
     {
-        // Check for equality using standard attributes (day, times, type) and either
-        // the module (which may be blank) or room intersection, as two different
-        // sessions wont be happening in the same room.
+        // Check type
+        if ($other instanceof static == false)
+            throw new \Exception('Cannot compare object of different type');
 
-        // Check for same day, type, start, end
-        if ($this->day != $other->day ||
-            $this->start != $other->start ||
-            $this->end != $other->end ||
-            $this->type != $other->type){
-            return false;
+        // Check session hash. See hash method for equality checking logic.
+        if ($this->hash() == $other->hash())
+            return true;
+
+        // This is an additional case where sessions can be considered equal
+        // due to the fact that module names can sometimes be missing. If all
+        // other unique attributes (day, start, end and type) are the same and
+        // at least one of the rooms in this session is present in the room list
+        // in $other, treat this as a match. This assumes that two different 
+        // sessions will never occur in the same room.
+        if ($this->day == $other->day &&
+            $this->start == $other->start &&
+            $this->end == $other->end &&
+            $this->type == $other->type &&
+            empty(array_intersect($this->rooms, $other->rooms)) == false){
+            return true;
         }
-
-        // Check for same module
-        if ($this->moduleName == $other->moduleName)
-            return true;
-
-        // Check for room
-        if (empty(array_intersect($this->rooms, $other->rooms)) == false)
-            return true;
 
         return false;
     }
