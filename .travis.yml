@@ -11,4 +11,4 @@ before_script:
   - pecl install ast-0.1.5
   - composer self-update
   - composer install --prefer-source --no-interaction --dev
-script: composer test && composer php-compatibility
+script: composer test-all

@@ -22,6 +22,11 @@
     "scripts": {
         "phan": "./vendor/bin/phan",
         "test": "./vendor/bin/phpunit --bootstrap vendor/autoload.php tests",
-        "php-compatibility": "./vendor/bin/phpcs -p src --standard=PHPCompatibility --runtime-set testVersion 7.1-"
+        "php-compatibility": "./vendor/bin/phpcs -p src --standard=PHPCompatibility --runtime-set testVersion 7.1-",
+        "test-all": [
+            "@test",
+            "@phan",
+            "@php-compatibility"
+        ]
     }
 }
