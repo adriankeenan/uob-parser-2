@@ -151,7 +151,7 @@ All session and course data fields provided on the official university website a
 
 #### Errors
 
-Exceptions will be thrown either as `\Exception` or [`\UoBParser\Error`](src/UoBParser/Error.php), which includes an additional `getID()` method. The list of potention error IDs can be found [here](src/UoBParser/Parser.php).
+Exceptions will be thrown either as `\Exception` or [`\UoBParser\Error`](src/Error.php), which includes an additional `getID()` method. The list of potention error IDs can be found [here](src/Parser.php).
 
 ### Webservice
 
