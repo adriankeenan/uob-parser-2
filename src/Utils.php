@@ -53,33 +53,35 @@ class Utils
         $now = static::now();
         $year = $now->year;
 
-        // Date ranges
+        // Date ranges from the term dates page: https://www.beds.ac.uk/about-us/our-university/dates
+        // As noted in the doc block - if in between terms, return the next term.
+        // For this reason, only the end date of each term is needed, because the
+        // start date is set to the end date of the previous term.
         $termRanges = [
             [
                 'term' => 1,
-                'start' => $now->setDate($year, 9, 1)->startOfDay(),
-                'end' => $now->setDate($year, 12, 15)->endOfDay(),
-            ],
-            [
-                'term' => 2,
-                'start' => $now->setDate($year, 12, 15)->startOfDay(),
+                'start' => $now->setDate($year, 10, 20)->startOfDay(),
                 'end' => $now->setDate($year, 12, 31)->endOfDay(),
             ],
             [
-                'term' => 2,
+                'term' => 1,
                 'start' => $now->setDate($year, 1, 1)->startOfDay(),
-                'end' => $now->setDate($year, 3, 20)->endOfDay(),
+                'end' => $now->setDate($year, 1, 24)->endOfDay(),
+            ],
+            [
+                'term' => 2,
+                'start' => $now->setDate($year, 1, 25)->startOfDay(),
+                'end' => $now->setDate($year, 5, 31)->endOfDay(),
             ],
             [
                 'term' => 3,
-                'start' => $now->setDate($year, 3, 20)->startOfDay(),
-                'end' => $now->setDate($year, 9, 1)->endOfDay(),
+                'start' => $now->setDate($year, 6, 1)->startOfDay(),
+                'end' => $now->setDate($year, 10, 19)->endOfDay(),
             ],
         ];
 
         foreach ($termRanges as $termRange){
-
-            if ($now->between($termRange['start'], $termRange['end']))
+            if ($now->between($termRange['start'], $termRange['end'], true))
                 return $termRange['term'];
         }
 
