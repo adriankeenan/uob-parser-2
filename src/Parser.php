@@ -68,9 +68,9 @@ class Parser
                 throw new Error('Server response error', self::ERROR_SERVER_COMMUNICATION, 0, $e);
             }
 
-            $sessions = $this->parseSessionDocument($src);
-
-            return new Responses\SessionsResponse($timetableUrl, $sessions);
+            $response = $this->parseSessionDocument($src);
+            $response->timetableUrl = $timetableUrl;
+            return $response;
         } catch (Error $e) {
             throw $e;
         } catch (Exception $e) {
@@ -81,7 +81,7 @@ class Parser
     /**
      * Get a list of session objects from the source HTML
      * @param string $src HTLM source
-     * @return array<Entities\Session>
+     * @return Responses\SessionsResponse
      */
     public function parseSessionDocument($src)
     {
@@ -93,6 +93,21 @@ class Parser
         $doc->loadHTML($src);
 
         $xpath = new DOMXpath($doc);
+
+        // Parse timetable details. These queries are really brittle, although in theory
+        // not moreso than the session data itself. Just leave these values null if
+        // parsing fails.
+        $courseName = null;
+        $dateRange = null;
+
+        try {
+            $query = "//table[@class='header-border-args']//table[@class='header-5-args']//table//td";
+
+            $courseName = $xpath->query($query."//span[@class='header-5-0-5']")->item(0)->nodeValue;
+            $dateRange = $xpath->query($query)->item(1)->nodeValue;
+        } catch (\Exception $e) {
+
+        }
 
         // Each table with class spreadsheet contains the timetable for a given day.
         // Should be 5 entries (Monday to Friday).
@@ -193,7 +208,7 @@ class Parser
             }
         }
 
-        return $sessions;
+        return new Responses\SessionsResponse(null, $courseName, $dateRange, $sessions);
     }
 
     /**

@@ -125,6 +125,10 @@ All session and course data fields provided on the official university website a
     object(UoBParser\Responses\SessionsResponse)#106 (2) {
       ["timetableUrl"]=>
       string(36) "https://timetable.beds.ac.uk/sws1819"
+      ["courseName"]=>
+      string(51) "Computer Science - BSc (Hons) - Ltn - Year 1 Feb FT"
+      ["dateRange"]=>
+      string(44) "Weeks: 24-31, 33-36 (10 Jun 2019-8 Sep 2019)"
       ["sessions"]=>
       array(21) {
         [0]=>
@@ -205,6 +209,8 @@ Endpoints:
         "response_time": 1.24,
         "error": false,
         "timetable_url": "https://timetable.beds.ac.uk/sws1819",
+        "course_name": "Computer Science - BSc (Hons) - Ltn - Year 1 Feb FT",
+        "date_range": "Weeks: 24-31, 33-36 (10 Jun 2019-8 Sep 2019)",
         "sessions": [
             {
                 "module_name": "Fundamentals Of Computer Studies",

@@ -21,10 +21,26 @@ final class ParserSessionsTest extends TestCase
         $this->parser->parseSessionDocument('No Such Page');
     }
 
+    public function testCourseName(): void
+    {
+        $parseResult = $this->parser->parseSessionDocument($this->testParseData);
+        $expected = 'Electronic Engineering (With Professional Practice Year) - BENG (Hons) - Ltn - Y4 Oct FT';
+
+        $this->assertEquals($expected, $parseResult->courseName);
+    }
+
+    public function testDateRange(): void
+    {
+        $parseResult = $this->parser->parseSessionDocument($this->testParseData);
+        $expected = 'Weeks: 35-34 (27 Aug 2018-25 Aug 2019)';
+
+        $this->assertEquals($expected, $parseResult->dateRange);
+    }
+
     public function testSessions(): void
     {
         $parseResult = $this->parser->parseSessionDocument($this->testParseData);
-        $sessions = UoBParser\Utils::objectsToArrays($parseResult);
+        $sessions = UoBParser\Utils::objectsToArrays($parseResult->sessions);
 
         $expected = [
             // This session is merged from two sessions, due to overlapping attributes

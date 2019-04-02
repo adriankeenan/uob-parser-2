@@ -7,9 +7,19 @@ use \UoBParser\Entities\Session;
 class SessionsResponse extends Response {
 
     /**
-     * @var string Timetable website URL.
+     * @var null|string Timetable website URL.
      */
     public $timetableUrl;
+
+    /**
+     * @var null|string Course name.
+     */
+    public $courseName;
+
+    /**
+     * @var null|string Session date range.
+     */
+    public $dateRange;
 
     /**
      * @var  array<Session> Session list.
@@ -17,12 +27,16 @@ class SessionsResponse extends Response {
     public $sessions;
 
     /**
-     * @param string $timetableUrl Timetable website URL.
+     * @param null|string $timetableUrl Timetable website URL.
+     * @param null|string $courseName Course name.
+     * @param null|string $dateRange Session date range.
      * @param array<Session> $sessions Session list.
      */
-    public function __construct($timetableUrl, $sessions)
+    public function __construct($timetableUrl, $courseName, $dateRange, $sessions)
     {
         $this->timetableUrl = $timetableUrl;
+        $this->courseName = $courseName;
+        $this->dateRange = $dateRange;
         $this->sessions = $sessions;
     }
 
@@ -34,6 +48,8 @@ class SessionsResponse extends Response {
     {
         return [
             'timetable_url' => $this->timetableUrl,
+            'course_name'   => $this->courseName,
+            'date_range'    => $this->dateRange,
             'sessions'      => \UoBParser\Utils::objectsToArrays($this->sessions),
         ];
     }
