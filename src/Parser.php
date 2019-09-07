@@ -34,15 +34,13 @@ class Parser
             $timetableUrl = 'https://timetable.beds.ac.uk/sws'.Utils::yearString();
             $timetablePostUrl = $timetableUrl.'/showtimetable.asp';
 
-            // Get the current term (estimated)
-            $termWeekRanges = [
-                1 => array_merge(range(6, 16), range(20, 23)),
-                2 => array_merge(range(24, 33), range(37, 41)),
-                3 => array_merge(range(42, 49), range(51, 54))
-            ];
-
             // Get relevant lbxWeeks for term. Honestly not really how this gets generated,
             // just using observed values.
+            $termWeekRanges = [
+                1 => array_merge(range(6, 16), range(20, 23)),
+                2 => array_merge(range(24, 32), range(36, 41)),
+                3 => array_merge(range(42, 56)),
+            ];
             $currentTermWeeks = $termWeekRanges[Utils::estimatedTerm()];
 
             $params = [
@@ -56,11 +54,10 @@ class Parser
                 'btnShowTimetable'      =>  'View Timetable',
                 'ObjectClass'           =>  'programme of study',
                 'ObjectClassIdentifier' =>  'lbxPos',
-                'idtype'                =>  'id'
+                'idtype'                =>  'id',
             ];
 
-            try
-            {
+            try {
                 $client = Utils::makeGuzzle();
                 $response = $client->request('POST', $timetablePostUrl, ['form_params' => $params]);
                 $src = $response->getBody();
