@@ -1,5 +1,7 @@
 # uob-parser-2
 
+__⚠️ This project is no longer maintained and likely requires changes to return the correct data for 2019/2020 and onwards.__
+
 [![Build Status](https://travis-ci.com/adriankeenan/uob-parser-2.svg?branch=master)](https://travis-ci.com/adriankeenan/uob-parser-2)
 
 A parser for the University of Bedfordshire timetable system which includes a JSON REST
