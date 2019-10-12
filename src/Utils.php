@@ -60,7 +60,7 @@ class Utils
         $termRanges = [
             [
                 'term' => 1,
-                'start' => $now->setDate($year, 10, 20)->startOfDay(),
+                'start' => $now->setDate($year, 10, 10)->startOfDay(),
                 'end' => $now->setDate($year, 12, 31)->endOfDay(),
             ],
             [
@@ -76,7 +76,7 @@ class Utils
             [
                 'term' => 3,
                 'start' => $now->setDate($year, 6, 1)->startOfDay(),
-                'end' => $now->setDate($year, 10, 19)->endOfDay(),
+                'end' => $now->setDate($year, 10, 9)->endOfDay(),
             ],
         ];
 
