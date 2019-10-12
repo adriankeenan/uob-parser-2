@@ -22,6 +22,11 @@ class SessionsResponse extends Response {
     public $dateRange;
 
     /**
+     * @var null|int Estimated term based on current date.
+     */
+    public $estimatedTerm;
+
+    /**
      * @var  array<Session> Session list.
      */
     public $sessions;
@@ -37,6 +42,7 @@ class SessionsResponse extends Response {
         $this->timetableUrl = $timetableUrl;
         $this->courseName = $courseName;
         $this->dateRange = $dateRange;
+        $this->estimatedTerm = null;
         $this->sessions = $sessions;
     }
 
@@ -47,10 +53,11 @@ class SessionsResponse extends Response {
     public function toArray()
     {
         return [
-            'timetable_url' => $this->timetableUrl,
-            'course_name'   => $this->courseName,
-            'date_range'    => $this->dateRange,
-            'sessions'      => \UoBParser\Utils::objectsToArrays($this->sessions),
+            'timetable_url'     => $this->timetableUrl,
+            'course_name'       => $this->courseName,
+            'date_range'        => $this->dateRange,
+            'estimated_term'    => $this->estimatedTerm,
+            'sessions'          => \UoBParser\Utils::objectsToArrays($this->sessions),
         ];
     }
 

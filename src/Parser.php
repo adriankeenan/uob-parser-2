@@ -41,7 +41,8 @@ class Parser
                 2 => array_merge(range(24, 32), range(36, 41)),
                 3 => array_merge(range(42, 56)),
             ];
-            $currentTermWeeks = $termWeekRanges[Utils::estimatedTerm()];
+            $estimatedTerm = Utils::estimatedTerm();
+            $currentTermWeeks = $termWeekRanges[$estimatedTerm];
 
             $params = [
                 'ddlDepartments'        =>  $dept,
@@ -67,6 +68,7 @@ class Parser
 
             $response = $this->parseSessionDocument($src);
             $response->timetableUrl = $timetableUrl;
+            $response->estimatedTerm = $estimatedTerm;
             return $response;
         } catch (Error $e) {
             throw $e;
