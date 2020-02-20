@@ -69,6 +69,38 @@ class Parser
             $response = $this->parseSessionDocument($src);
             $response->timetableUrl = $timetableUrl;
             $response->estimatedTerm = $estimatedTerm;
+
+            // Add data warning
+            for ($day = 0; $day < 5; $day++) {
+                $response->sessions[] = new Entities\Session(
+                   'DO NOT USE - Data is no longer checked for accuracy and may be incorrect.',
+                   'N/A',
+                   $day,
+                   '09:00',
+                   '18:00',
+                   []
+                );
+            }
+            // Sort sessions
+            usort($response->sessions, function($a, $b){
+                // Sort by day (asc)
+                if ($a->day != $b->day)
+                    return $a->day - $b->day;
+
+                // Sort by time (asc)
+                [$aStartHours, $aStartMinutes] = explode(':', $a->start);
+                $aStart = (60 * $aStartHours) + $aStartMinutes;
+
+                [$bStartHours, $bStartMinutes] = explode(':', $b->start);
+                $bStart = (60 * $bStartHours) + $bStartMinutes;
+
+                if ($aStart != $bStart)
+                    return $aStart - $bStart;
+
+                // Sort by length (desc)
+                return $b->length() - $a->length();
+            });
+
             return $response;
         } catch (Error $e) {
             throw $e;
