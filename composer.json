@@ -3,9 +3,10 @@
     "description": "A parser for the University of Bedfordshire timetable system",
     "require": {
         "php": ">=7.1",
+        "ext-xml": "*",
+        "ext-json": "*",
         "guzzlehttp/guzzle": "~6.0",
         "slim/slim": "^3.0",
-        "ext-xml": "*",
         "nesbot/carbon": "^2.7"
     },
     "autoload": {
