@@ -1,17 +1,16 @@
 language: php
 php:
+  - '7.4'
   - '7.3'
   - '7.2'
-  - '7.1'
 matrix:
   allow_failures:
     php:
       - 'nightly'
-      - '7.4snapshot'
 before_script:
-  - pecl install ast-0.1.5
   - composer self-update
   - composer install --prefer-source --no-interaction
 script: 
-  - composer test 
-  - composer php-compatibility 
+  - composer test
+  - composer php-compatibility
+  - composer phan

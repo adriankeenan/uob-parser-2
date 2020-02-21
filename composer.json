@@ -2,7 +2,7 @@
     "name": "adriankeenan/uob-parser-2",
     "description": "A parser for the University of Bedfordshire timetable system",
     "require": {
-        "php": ">=7.1",
+        "php": ">=7.2",
         "ext-xml": "*",
         "ext-json": "*",
         "guzzlehttp/guzzle": "~6.0",
