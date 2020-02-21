@@ -21,7 +21,7 @@
         "phan/phan": "^2.5"
     },
     "scripts": {
-        "phan": "./vendor/bin/phan --allow-polyfill-parser",
+        "phan": "./vendor/bin/phan --allow-polyfill-parser --progress-bar",
         "test": "./vendor/bin/phpunit --bootstrap vendor/autoload.php tests",
         "php-compatibility": "./vendor/bin/phpcs -p src --standard=PHPCompatibility --runtime-set testVersion 7.1-",
         "test-all": [

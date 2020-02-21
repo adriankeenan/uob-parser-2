@@ -276,6 +276,7 @@ class Parser
      * metadata
      * @param string $src Source javascript file
      * @return Responses\CoursesResponse
+     * @suppress PhanTypeMismatchArgumentNullable, PhanTypeMismatchArgumentNullableInternal
      */
     public function parseCourseDocument($src)
     {
