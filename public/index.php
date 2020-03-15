@@ -154,7 +154,7 @@ $app->get('/courses', function(Request $request, Response $response) {
         // Add session URL to coursess
         $data['courses'] = array_map(function($course) use ($baseUrl) {
             $args = [
-                'dept' => $course['department']['id'],
+                'dept' => $course['department']['id'] ?? null,
                 'course' => $course['id'],
                 'level' => $course['level'],
             ];
