@@ -13,9 +13,18 @@ class Parser
     const ERROR_SERVER_RESPONSE = 'server_response_invalid';
     const ERROR_COURSE_INVALID = 'course_invalid';
 
+    protected $cache = null;
+
     public function __construct()
     {
         libxml_use_internal_errors(true);
+
+        if (getenv('UOB_PARSER_REDIS_HOST')) {
+            $client = new \Predis\Client(getenv('UOB_PARSER_REDIS_HOST'));
+            $pool = new \Cache\Adapter\Predis\PredisCachePool($client);
+            $namespacedPool = new \Cache\Namespaced\NamespacedCachePool($pool, 'uob_parser');
+            $this->cache = $namespacedPool;
+        }
     }
 
     /**
@@ -243,7 +252,7 @@ class Parser
     }
 
     /**
-     * Download the metadata javascript file and return a response array
+     * Download the metadata javascript file or load from cache and return a response array
      * containing the courses and departments
      * @throws Error
      * @return Responses\CoursesResponse
@@ -251,16 +260,35 @@ class Parser
     public function getCourses()
     {
         try {
-            // Build generated JavaScript URL
-            $url = 'https://timetable.beds.ac.uk/sws'.Utils::yearString().'/js/data_autogen.js';
+            // Attempt to fetch courses data from cache (if enabled) or download data. Caching
+            // is utilised because the result is large (~5MB) and the webserver appears to throttle
+            // (based on a heuristic) which can slow down this operation.
+            $src = null;
+            $cacheKey = 'courses_src';
+            // Check cache
+            if ($this->cache != null && $this->cache->hasItem($cacheKey)) {
+                $src = $this->cache->getItem($cacheKey)->get();
+            }
+            // Otherwise fetch
+            else {
 
-            try
-            {
-                $client = Utils::makeGuzzle();
-                $response = $client->request('GET', $url);
-                $src = $response->getBody();
-            } catch (Exception $e) {
-                throw new Error('Server communication error', self::ERROR_SERVER_COMMUNICATION, 0, $e);
+                // Build generated JavaScript URL and fetch
+                $url = 'https://timetable.beds.ac.uk/sws'.Utils::yearString().'/js/data_autogen.js';
+                try
+                {
+                    $client = Utils::makeGuzzle();
+                    $response = $client->request('GET', $url);
+                    $src = (string)$response->getBody();
+                } catch (Exception $e) {
+                    throw new Error('Server communication error', self::ERROR_SERVER_COMMUNICATION, 0, $e);
+                }
+
+                // Set in cache for one hour (if enabled)
+                if ($this->cache != null) {
+                    $this->cache->save(
+                        $this->cache->getItem($cacheKey)->set($src)->expiresAfter(60 * 60)
+                    );
+                }
             }
 
             return $this->parseCourseDocument($src);
