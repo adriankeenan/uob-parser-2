@@ -34,9 +34,9 @@ class Utils
         $now = static::now();
 
         // Get start year. Assume the academic year started last year
-        // unless we're past July 1st.
+        // unless we're past September 1st.
         $year = intval($now->format('y')) - 1;
-        if ($now->month >= 7)
+        if ($now->month >= 9)
             $year++;
 
         return sprintf('%s%s', $year, $year + 1);
